@@ -3,245 +3,331 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TalentBridge - Onboarding Form</title>
+    <title>AuraPulse - Universal Talent & Mentorship Ecosystem</title>
     <style>
         :root {
-            --bg-dark: #0a0f1d;
-            --card-bg: #131c31;
-            --primary: #f5d061;
+            --bg-deep: #070b14;
+            --sidebar-bg: #0d1527;
+            --card-bg: #141f38;
+            --primary: #a1e3f9;
+            --primary-hover: #7cd3f0;
+            --accent-gold: #f5d061;
             --text-main: #ffffff;
-            --text-muted: #8fa0c4;
-            --input-bg: #1c294a;
-            --border-color: #2a3b63;
+            --text-muted: #8ea1c4;
+            --input-bg: #1b2a4a;
+            --border-color: #253966;
+            --accent-red: #ff5e62;
         }
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: sans-serif; }
-        body { background-color: var(--bg-dark); color: var(--text-main); min-height: 100vh; display: flex; justify-content: center; align-items: center; padding: 20px; }
-        .container { width: 100%; max-width: 600px; background-color: var(--card-bg); border-radius: 16px; padding: 40px; border: 1px solid var(--border-color); }
-        .progress-container { display: flex; justify-content: space-between; position: relative; margin-bottom: 30px; }
-        .progress-container::before { content: ''; position: absolute; top: 50%; left: 0; height: 4px; width: 100%; background-color: var(--input-bg); z-index: 1; transform: translateY(-50%); }
-        .progress-bar { position: absolute; top: 50%; left: 0; height: 4px; width: 0%; background-color: var(--primary); z-index: 1; transform: translateY(-50%); transition: width 0.3s; }
-        .step-node { width: 35px; height: 35px; border-radius: 50%; background-color: var(--input-bg); border: 2px solid var(--border-color); display: flex; justify-content: center; align-items: center; font-weight: bold; color: var(--text-muted); position: relative; z-index: 2; }
-        .step-node.active { border-color: var(--primary); color: var(--primary); background-color: var(--bg-dark); }
-        .step-node.completed { background-color: var(--primary); border-color: var(--primary); color: var(--bg-dark); }
-        .form-step { display: none; }
-        .form-step.active { display: block; }
-        h2 { margin-bottom: 20px; font-size: 22px; }
-        .form-group { display: flex; flex-direction: column; gap: 8px; margin-bottom: 15px; }
-        label { font-size: 11px; font-weight: bold; color: var(--text-muted); text-transform: uppercase; }
-        input, select, textarea { background-color: var(--input-bg); border: 1px solid var(--border-color); padding: 12px; border-radius: 8px; color: var(--text-main); font-size: 14px; width: 100%; }
-        textarea { height: 80px; resize: none; }
-        .btn-container { display: flex; justify-content: space-between; margin-top: 30px; }
-        .btn { padding: 12px 24px; border-radius: 8px; font-weight: bold; cursor: pointer; border: none; }
-        .btn-next { background-color: var(--primary); color: var(--bg-dark); margin-left: auto; }
-        .btn-prev { background-color: transparent; color: var(--text-muted); border: 1px solid var(--border-color); }
-        .plan-card { background-color: var(--input-bg); border: 2px solid var(--border-color); border-radius: 8px; padding: 20px; margin-bottom: 15px; cursor: pointer; }
-        .plan-card.selected { border-color: var(--primary); }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', system-ui, sans-serif; }
+        body { background-color: var(--bg-deep); color: var(--text-main); min-height: 100vh; display: flex; overflow: hidden; }
+
+        /* ================= LEFT SIDEBAR LAYOUT ================= */
+        .sidebar {
+            width: 280px;
+            background-color: var(--sidebar-bg);
+            border-right: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 30px 20px;
+            height: 100vh;
+            flex-shrink: 0;
+        }
+
+        .brand-section { text-align: center; margin-bottom: 35px; }
+        .brand-logo { font-size: 24px; font-weight: 800; color: var(--primary); letter-spacing: 1px; }
+        .brand-tagline { font-size: 11px; color: var(--accent-gold); text-transform: uppercase; letter-spacing: 2px; margin-top: 4px; }
+
+        .nav-menu { display: flex; flex-direction: column; gap: 8px; flex-grow: 1; }
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: var(--text-muted);
+            text-decoration: none;
+            padding: 14px 18px;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            background: transparent;
+            border: none;
+            text-align: left;
+            transition: all 0.2s ease;
+        }
+        .nav-item:hover, .nav-item.active {
+            color: var(--text-main);
+            background-color: var(--card-bg);
+            box-shadow: inset 4px 0 0 var(--primary);
+        }
+
+        /* ================= COMPONENT: AURAPULSE RADIO ================= */
+        .audio-widget {
+            background: linear-gradient(135deg, #1b2644, #111a30);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 15px;
+            margin-top: 20px;
+            text-align: center;
+        }
+        .audio-title { font-size: 12px; font-weight: bold; color: var(--primary); margin-bottom: 8px; display: flex; align-items: center; justify-content: center; gap: 6px; }
+        .audio-controls { display: flex; justify-content: center; align-items: center; gap: 15px; }
+        .audio-btn { background: var(--primary); border: none; width: 32px; height: 32px; border-radius: 50%; color: var(--bg-deep); font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 12px; transition: 0.2s; }
+        .audio-btn:hover { background: var(--primary-hover); transform: scale(1.05); }
+
+        /* ================= MAIN CONTENT SURFACE ================= */
+        .main-content {
+            flex-grow: 1;
+            padding: 40px;
+            overflow-y: auto;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+        }
+
+        .content-container { width: 100%; max-width: 850px; }
+        
+        .app-screen { display: none; }
+        .app-screen.active { display: block; animation: slideIn 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
+        @keyframes slideIn { from { opacity: 0; transform: translateX(15px); } to { opacity: 1; transform: translateX(0); } }
+
+        h2 { font-size: 26px; font-weight: 700; margin-bottom: 8px; display: flex; align-items: center; gap: 10px; }
+        .subtitle { color: var(--text-muted); font-size: 14px; margin-bottom: 30px; line-height: 1.6; }
+
+        /* ================= INTERACTIVE COMPONENT SHAPES ================= */
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        @media (max-width: 600px) { .form-grid { grid-template-columns: 1fr; } }
+        .form-group { display: flex; flex-direction: column; gap: 8px; margin-bottom: 20px; }
+        label { font-size: 11px; font-weight: bold; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; }
+        input, select, textarea { background-color: var(--input-bg); border: 1px solid var(--border-color); padding: 14px 18px; border-radius: 8px; color: var(--text-main); font-size: 14px; width: 100%; transition: 0.2s; }
+        input:focus, select:focus, textarea:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 10px rgba(161, 227, 249, 0.15); }
+        textarea { height: 110px; resize: none; }
+
+        .cards-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 20px; }
+        @media (max-width: 750px) { .cards-layout { grid-template-columns: 1fr; } }
+        .pulse-card { background-color: var(--card-bg); border: 2px solid var(--border-color); border-radius: 12px; padding: 25px; cursor: pointer; transition: all 0.2s ease; position: relative; }
+        .pulse-card:hover { border-color: var(--text-muted); transform: translateY(-2px); }
+        .pulse-card.selected { border-color: var(--primary); background: rgba(161, 227, 249, 0.02); }
+        .pulse-card h3 { font-size: 16px; margin-bottom: 6px; color: #fff; }
+        .pulse-card .author { font-size: 12px; color: var(--primary); font-weight: 600; margin-bottom: 12px; }
+        .pulse-card p { font-size: 13px; color: var(--text-muted); line-height: 1.5; }
+        .tag-pill { font-size: 10px; font-weight: bold; background: rgba(161, 227, 249, 0.1); color: var(--primary); padding: 4px 10px; border-radius: 6px; text-transform: uppercase; display: inline-block; margin-top: 15px; }
+
+        .btn { padding: 14px 28px; border-radius: 8px; font-weight: bold; cursor: pointer; border: none; font-size: 14px; transition: 0.2s; display: inline-flex; align-items: center; justify-content: center; gap: 8px; }
+        .btn-primary { background-color: var(--primary); color: var(--bg-deep); }
+        .btn-primary:hover { background-color: var(--primary-hover); }
+
+        /* DATA MONITOR PIPELINE TABLE */
+        .table-holder { width: 100%; overflow-x: auto; margin-top: 20px; border-radius: 10px; border: 1px solid var(--border-color); }
+        table { width: 100%; border-collapse: collapse; text-align: left; font-size: 13px; background-color: rgba(13, 21, 39, 0.3); }
+        th, td { padding: 15px 20px; border-bottom: 1px solid var(--border-color); }
+        th { background-color: var(--sidebar-bg); color: var(--text-muted); text-transform: uppercase; font-size: 11px; }
+        .status-badge { padding: 4px 8px; border-radius: 4px; font-size: 10px; font-weight: bold; background: rgba(245, 208, 97, 0.15); color: var(--accent-gold); }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <div class="progress-container">
-        <div class="progress-bar" id="progressBar"></div>
-        <div class="step-node active" data-step="1">1</div>
-        <div class="step-node" data-step="2">2</div>
-        <div class="step-node" data-step="3">3</div>
+    <div class="sidebar">
+        <div>
+            <div class="brand-section">
+                <div class="brand-logo">✨ AuraPulse</div>
+                <div class="brand-tagline">Universal Talent Bridge</div>
+            </div>
+
+            <div class="nav-menu" id="sidebarMenu" style="display: none;">
+                <button class="nav-item active" id="menuHome" onclick="changeWorkspaceTab('home')">🪐 Opportunity Deck</button>
+                <button class="nav-item" id="menuDashboard" onclick="changeWorkspaceTab('dashboard')">📊 My Hub Operations</button>
+                <button class="nav-item logout-tab" onclick="performSystemLogoff()" style="margin-top: 20px; color: var(--accent-red);">🔒 Disconnect Session</button>
+            </div>
+        </div>
+
+        <div class="audio-widget">
+            <div class="audio-title">🎵 AuraPulse Radio</div>
+            <div class="audio-controls">
+                <button type="button" class="audio-btn" id="audioPlayBtn" onclick="togglePulseAudioTrack()">PLAY</button>
+                <span id="audioTrackLabel" style="font-size: 11px; color: var(--text-muted);">Ambient Synth Loop</span>
+            </div>
+            <audio id="pulseBackgroundAudio" loop src="https://assets.mixkit.co/music/preview/mixkit-tech-house-vibes-130.mp3"></audio>
+        </div>
     </div>
 
-    <form id="onboardingForm" onsubmit="event.preventDefault();">
-        <div class="form-step active" data-step="1">
-            <h2>Personal Information</h2>
-            <div class="form-group">
-                <label>Full Name</label>
-                <input type="text" id="fullName" placeholder="Your Name">
+    <div class="main-content">
+        <div class="content-container">
+
+            <div class="app-screen active" id="viewAuthGateway">
+                <h2>Initialize Identity Profile</h2>
+                <div class="subtitle">Welcome to AuraPulse. Design your system profile matrix card below to begin connecting.</div>
+                
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="profileRole">System Profile Assignment Category</label>
+                        <select id="profileRole" onchange="adjustFacultySecurityBarrier(this.value)">
+                            <option value="student">Student Account (Showcase Talent, Find Events & Apply)</option>
+                            <option value="teacher">Faculty Instructor (Post Shows, Research Tasks & Evaluate)</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="profileName">Full Account Handle / Name</label>
+                        <input type="text" id="profileName" placeholder="Type identity signature">
+                    </div>
+                </div>
+
+                <div class="form-group" id="facultyPasscodeRow" style="display: none; background: rgba(255, 94, 98, 0.04); padding: 20px; border-radius: 10px; border: 1px dashed var(--border-color);">
+                    <label for="gatePasscode" style="color: var(--accent-red);">🔑 Enter Faculty Verification Key Passcode</label>
+                    <input type="password" id="gatePasscode" placeholder="Enter encrypted key phrase (Try: FACULTY123)">
+                    <small style="color: var(--text-muted); font-size: 11px; margin-top: 5px;">Cryptographic protection limits access to instructor databases panels maps.</small>
+                </div>
+
+                <div class="form-group">
+                    <label for="profileDomain">Core Creative/Scientific Focus Domain</label>
+                    <select id="profileDomain">
+                        <option value="Music & Performance">Music, Classical Tracks & Performing Arts</option>
+                        <option value="Dance Choreography">Choreography & Cultural Rhythms</option>
+                        <option value="Scientific Research">Academic Exploration & Complex Research</option>
+                        <option value="Design & Innovation">Fine Arts, Media & Digital Coding</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="profileBio">Bio Overview Narrative Summary</label>
+                    <textarea id="profileBio" placeholder="Describe past performance credentials or upcoming assignment targets..."></textarea>
+                </div>
+
+                <button type="button" class="btn btn-primary" style="width: 100%; margin-top: 10px;" onclick="buildSessionProfileAndLogin()">Compile Profile Deck & Enter Hub →</button>
             </div>
-            <div class="form-group">
-                <label>Email Address</label>
-                <input type="email" id="email" placeholder="name@example.com">
+
+            <div class="app-screen" id="viewStudentPlatform">
+                <h2>🪐 Global Opportunity Platform Deck</h2>
+                <div class="subtitle">Welcome, <span id="lblStudentAlias" style="color: var(--primary);"></span>. Explore active research operations, musical bands, or dance competitions uploaded directly by verified educators.</div>
+                
+                <div class="cards-layout" id="opportunitiesDeckGrid">
+                    </div>
+
+                <div style="margin-top: 35px; background: rgba(13,21,39,0.5); padding: 25px; border-radius: 12px; border: 1px solid var(--border-color);">
+                    <label style="color: var(--primary); font-size: 12px;">📬 Application Matrix Terminal</label>
+                    <div style="font-size: 14px; margin: 5px 0 15px 0;">Target: <span id="lblFocusedProject" style="font-weight: bold; color: var(--accent-gold);">None Highlighted</span></div>
+                    <textarea id="txtApplicationPitch" placeholder="Type your introductory note or pitch explaining your talents directly to this teacher..."></textarea>
+                    <button type="button" class="btn btn-primary" style="margin-top: 10px; padding: 10px 20px;" onclick="dispatchPitchApplicationToFacultyLogs()">Send Portfolio Application 🚀</button>
+                </div>
             </div>
+
+            <div class="app-screen" id="viewTeacherPlatform">
+                <h2>📊 Secured Faculty Operations Console</h2>
+                <div class="subtitle">Faculty Encryption Stream Active: <span id="lblTeacherAlias" style="color: var(--primary);"></span>. Deploy programmatic assignments or evaluate candidate student rosters.</div>
+                
+                <div style="background: var(--sidebar-bg); padding: 25px; border-radius: 12px; border: 1px solid var(--border-color); margin-bottom: 35px;">
+                    <h3 style="font-size: 16px; margin-bottom: 15px; color: var(--primary);">➕ Broadcast New Talent Competition / Project Track</h3>
+                    
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="txtNewTitle">Event Assignment Name</label>
+                            <input type="text" id="txtNewTitle" placeholder="e.g., Annual Fusion Dance Auditions">
+                        </div>
+                        <div class="form-group">
+                            <label for="selNewCategory">Strategic Category Field Mapping</label>
+                            <select id="selNewCategory">
+                                <option value="Music & Performance">Music & Live Performance</option>
+                                <option value="Dance Choreography">Dance Choreography</option>
+                                <option value="Scientific Research">Scientific Advanced Research</option>
+                                <option value="Design & Innovation">Design & Technology Innovation</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="txtNewDesc">Requirements & Event Parameters Overview</label>
+                        <textarea id="txtNewDesc" placeholder="Explain rules, metrics, or targets requested to pull talented candidates into your circle..."></textarea>
+                    </div>
+                    <button type="button" class="btn btn-primary" style="padding: 10px 20px;" onclick="teacherPublishNewProgramCard()">Broadcast Opportunity 📢</button>
+                </div>
+
+                <h2>📂 Inbound Candidate Processing Logs Queue</h2>
+                <p class="subtitle">Secure logging streams indexing incoming portfolio submissions matching your department profile.</p>
+                
+                <div class="table-holder">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Applicant Candidate</th>
+                                <th>Target Project Assignment</th>
+                                <th>Field Spec</th>
+                                <th>Portfolio Pitch Content Record</th>
+                                <th>Processing Pipeline Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tblApplicationsReviewBody">
+                            </tbody>
+                    </table>
+                </div>
+            </div>
+
         </div>
-
-        <div class="form-step" data-step="2">
-            <h2>Primary Passion</h2>
-            <div class="form-group">
-                <label>Your Main Talent</label>
-                <input type="text" id="passion" placeholder="e.g. Dance, Coding">
-            </div>
-            <div class="form-group">
-                <label>Goals</label>
-                <textarea id="goals" placeholder="What are your main goals?"></textarea>
-            </div>
-        </div>
-
-        <div class="form-step" data-step="3">
-            <h2>Select Your Plan</h2>
-            <div class="plan-card selected">
-                <h3>Hobbyist Plan</h3>
-                <p style="color: var(--text-muted); font-size: 13px; margin-top: 5px;">Free Access to all fundamental boards.</p>
-            </div>
-        </div>
-
-        <div class="btn-container">
-            <button type="button" class="btn btn-prev" id="prevBtn" style="display: none;" onclick="navigateStep(-1)">← Back</button>
-            <button type="button" class="btn btn-next" id="nextBtn" onclick="navigateStep(1)">Continue →</button>
-        </div>
-    </form>
-</div>
-
-<script>
-    let currentStep = 1;
-    const totalSteps = 3;
-
-    function navigateStep(direction) {
-        document.querySelector(`.form-step[data-step="${currentStep}"]`).classList.remove('active');
-        
-        currentStep += direction;
-
-        if (currentStep > totalSteps) {
-            alert("Success! Your profile has been submitted.");
-            currentStep = totalSteps;
-        }
-
-        document.querySelector(`.form-step[data-step="${currentStep}"]`).classList.add('active');
-        updateUI();
-    }
-
-    function updateUI() {
-        document.querySelectorAll('.step-node').forEach((node, idx) => {
-            const stepNum = idx + 1;
-            node.classList.remove('active', 'completed');
-            if (stepNum === currentStep) node.classList.add('active');
-            else if (stepNum < currentStep) node.classList.add('completed');
-        });
-
-        document.getElementById('progressBar').style.width = ((currentStep - 1) / (totalSteps - 1)) * 100 + '%';
-        document.getElementById('prevBtn').style.display = currentStep === 1 ? 'none' : 'block';
-        document.getElementById('nextBtn').innerText = currentStep === totalSteps ? 'Submit ✨' : 'Continue →';
-    }
-</script>
-
-</body>
-</html><!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TalentBridge - Onboarding Form</title>
-    <style>
-        :root {
-            --bg-dark: #0a0f1d;
-            --card-bg: #131c31;
-            --primary: #f5d061;
-            --text-main: #ffffff;
-            --text-muted: #8fa0c4;
-            --input-bg: #1c294a;
-            --border-color: #2a3b63;
-        }
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: sans-serif; }
-        body { background-color: var(--bg-dark); color: var(--text-main); min-height: 100vh; display: flex; justify-content: center; align-items: center; padding: 20px; }
-        .container { width: 100%; max-width: 600px; background-color: var(--card-bg); border-radius: 16px; padding: 40px; border: 1px solid var(--border-color); }
-        .progress-container { display: flex; justify-content: space-between; position: relative; margin-bottom: 30px; }
-        .progress-container::before { content: ''; position: absolute; top: 50%; left: 0; height: 4px; width: 100%; background-color: var(--input-bg); z-index: 1; transform: translateY(-50%); }
-        .progress-bar { position: absolute; top: 50%; left: 0; height: 4px; width: 0%; background-color: var(--primary); z-index: 1; transform: translateY(-50%); transition: width 0.3s; }
-        .step-node { width: 35px; height: 35px; border-radius: 50%; background-color: var(--input-bg); border: 2px solid var(--border-color); display: flex; justify-content: center; align-items: center; font-weight: bold; color: var(--text-muted); position: relative; z-index: 2; }
-        .step-node.active { border-color: var(--primary); color: var(--primary); background-color: var(--bg-dark); }
-        .step-node.completed { background-color: var(--primary); border-color: var(--primary); color: var(--bg-dark); }
-        .form-step { display: none; }
-        .form-step.active { display: block; }
-        h2 { margin-bottom: 20px; font-size: 22px; }
-        .form-group { display: flex; flex-direction: column; gap: 8px; margin-bottom: 15px; }
-        label { font-size: 11px; font-weight: bold; color: var(--text-muted); text-transform: uppercase; }
-        input, select, textarea { background-color: var(--input-bg); border: 1px solid var(--border-color); padding: 12px; border-radius: 8px; color: var(--text-main); font-size: 14px; width: 100%; }
-        textarea { height: 80px; resize: none; }
-        .btn-container { display: flex; justify-content: space-between; margin-top: 30px; }
-        .btn { padding: 12px 24px; border-radius: 8px; font-weight: bold; cursor: pointer; border: none; }
-        .btn-next { background-color: var(--primary); color: var(--bg-dark); margin-left: auto; }
-        .btn-prev { background-color: transparent; color: var(--text-muted); border: 1px solid var(--border-color); }
-        .plan-card { background-color: var(--input-bg); border: 2px solid var(--border-color); border-radius: 8px; padding: 20px; margin-bottom: 15px; cursor: pointer; }
-        .plan-card.selected { border-color: var(--primary); }
-    </style>
-</head>
-<body>
-
-<div class="container">
-    <div class="progress-container">
-        <div class="progress-bar" id="progressBar"></div>
-        <div class="step-node active" data-step="1">1</div>
-        <div class="step-node" data-step="2">2</div>
-        <div class="step-node" data-step="3">3</div>
     </div>
 
-    <form id="onboardingForm" onsubmit="event.preventDefault();">
-        <div class="form-step active" data-step="1">
-            <h2>Personal Information</h2>
-            <div class="form-group">
-                <label>Full Name</label>
-                <input type="text" id="fullName" placeholder="Your Name">
-            </div>
-            <div class="form-group">
-                <label>Email Address</label>
-                <input type="email" id="email" placeholder="name@example.com">
-            </div>
-        </div>
-
-        <div class="form-step" data-step="2">
-            <h2>Primary Passion</h2>
-            <div class="form-group">
-                <label>Your Main Talent</label>
-                <input type="text" id="passion" placeholder="e.g. Dance, Coding">
-            </div>
-            <div class="form-group">
-                <label>Goals</label>
-                <textarea id="goals" placeholder="What are your main goals?"></textarea>
-            </div>
-        </div>
-
-        <div class="form-step" data-step="3">
-            <h2>Select Your Plan</h2>
-            <div class="plan-card selected">
-                <h3>Hobbyist Plan</h3>
-                <p style="color: var(--text-muted); font-size: 13px; margin-top: 5px;">Free Access to all fundamental boards.</p>
-            </div>
-        </div>
-
-        <div class="btn-container">
-            <button type="button" class="btn btn-prev" id="prevBtn" style="display: none;" onclick="navigateStep(-1)">← Back</button>
-            <button type="button" class="btn btn-next" id="nextBtn" onclick="navigateStep(1)">Continue →</button>
-        </div>
-    </form>
-</div>
-
 <script>
-    let currentStep = 1;
-    const totalSteps = 3;
+    // System Architecture Reactive Memory Buffers Variables Data Structures
+    let userSessionState = { handle: "", profileRole: "", domain: "", summary: "" };
+    let chosenTrackDeckIndex = 0;
+    const CRYPTOGRAPHIC_ACCESS_PIN = "FACULTY123";
 
-    function navigateStep(direction) {
-        document.querySelector(`.form-step[data-step="${currentStep}"]`).classList.remove('active');
+    const localOpportunitiesPoolMemory = [
+        { title: "National Music Festival & Orchestra Track", mentor: "Mr. Keith (Music Mentor)", cat: "Music & Performance", desc: "Assembling a symphonic instrumental group to launch regional competition tracks. Open to violinists, vocalists and audio techs." },
+        { title: "Advanced Quantum Computing Observational Study", mentor: "Prof. Meera Sharma", cat: "Scientific Research", desc: "Studying cloud encryption telemetry lattices. Accepting high school student observers for raw modeling logs metrics data entries." },
+        { title: "Contemporary Fusion Dance Gala Auditions", mentor: "Mrs. Clara (Choreographer)", cat: "Dance Choreography", desc: "Seeking expressive theatrical stage artists to represent institutional cohorts at regional level showcases." }
+    ];
+
+    const localApplicationsQueueMemory = [
+        { name: "Sneha Patil", track: "Contemporary Fusion Dance Gala Auditions", cat: "Dance Choreography", pitch: "Classical Kathak dancer with 5 years practice. Wanting to learn contemporary formatting transformations.", stateStatus: "Awaiting Action Review" },
+        { name: "Rahul Kumar", track: "National Music Festival & Orchestra Track", cat: "Music & Performance", pitch: "Electric keyboard player with local studio records database access history. Hoping to lead backing melodies layers.", stateStatus: "Awaiting Action Review" }
+    ];
+
+    function adjustFacultySecurityBarrier(selectedRoleType) {
+        document.getElementById('facultyPasscodeRow').style.display = selectedRoleType === 'teacher' ? 'block' : 'none';
+    }
+
+    function togglePulseAudioTrack() {
+        const audioElement = document.getElementById('pulseBackgroundAudio');
+        const playBtn = document.getElementById('audioPlayBtn');
         
-        currentStep += direction;
+        if (audioElement.paused) {
+            audioElement.play().catch(e => console.log("Audio play delayed due to system interactions parameters."));
+            playBtn.innerText = "PAUSE";
+            playBtn.style.background = "var(--accent-gold)";
+        } else {
+            audioElement.pause();
+            playBtn.innerText = "PLAY";
+            playBtn.style.background = "var(--primary)";
+        }
+    }
 
-        if (currentStep > totalSteps) {
-            alert("Success! Your profile has been submitted.");
-            currentStep = totalSteps;
+    function buildSessionProfileAndLogin() {
+        const inputName = document.getElementById('profileName').value.trim();
+        const inputRole = document.getElementById('profileRole').value;
+        const inputDomain = document.getElementById('profileDomain').value;
+        const inputBio = document.getElementById('profileBio').value.trim();
+
+        if (!inputName || !inputBio) {
+            alert("Verification Block: Complete all profile text handle values and narratives!");
+            return;
         }
 
-        document.querySelector(`.form-step[data-step="${currentStep}"]`).classList.add('active');
-        updateUI();
-    }
+        if (inputRole === 'teacher') {
+            const pinCheck = document.getElementById('gatePasscode').value;
+            if (pinCheck !== CRYPTOGRAPHIC_ACCESS_PIN) {
+                alert("Security Authorization Failure: Access Key invalid. Operations locked.");
+                return;
+            }
+        }
 
-    function updateUI() {
-        document.querySelectorAll('.step-node').forEach((node, idx) => {
-            const stepNum = idx + 1;
-            node.classList.remove('active', 'completed');
-            if (stepNum === currentStep) node.classList.add('active');
-            else if (stepNum < currentStep) node.classList.add('completed');
-        });
+        userSessionState.handle = inputName;
+        userSessionState.profileRole = inputRole;
+        userSessionState.domain = inputDomain;
+        userSessionState.summary = inputBio;
 
-        document.getElementById('progressBar').style.width = ((currentStep - 1) / (totalSteps - 1)) * 100 + '%';
-        document.getElementById('prevBtn').style.display = currentStep === 1 ? 'none' : 'block';
-        document.getElementById('nextBtn').innerText = currentStep === totalSteps ? 'Submit ✨' : 'Continue →';
-    }
-</script>
+        // Reveal layout left-side operations navigational menus maps panels
+        document.getElementById('sidebarMenu').style.display = 'flex';
 
-</body>
-</html>
+        if (userSessionState.profileRole === 'student') {
+            document.getElementById('lblStudentAlias').innerText = userSessionState.handle;
+            renderStudentOpportunityDeck();
+            changeWork
