@@ -7,7 +7,6 @@
     <style>
         :root {
             --bg-deep: #050811;
-            --sidebar-bg: rgba(10, 16, 32, 0.9);
             --card-bg: rgba(20, 32, 58, 0.55);
             --primary: #a1e3f9;
             --primary-glow: rgba(161, 227, 249, 0.25);
@@ -15,9 +14,7 @@
             --text-main: #ffffff;
             --text-muted: #8da2cc;
             --input-bg: #15223d;
-            --border-color: rgba(35, 53, 92, 0.6);
-            --accent-red: #ff5e62;
-            --success: #2ec4b6;
+            --border-color: rgba(35, 53, 92, 0.7);
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', system-ui, sans-serif; }
@@ -25,251 +22,228 @@
         body { 
             background-color: var(--bg-deep); 
             background-image: 
-                radial-gradient(circle at 15% 25%, rgba(161, 227, 249, 0.07) 0%, transparent 35%),
-                radial-gradient(circle at 85% 75%, rgba(245, 208, 97, 0.04) 0%, transparent 40%);
+                radial-gradient(circle at 15% 25%, rgba(161, 227, 249, 0.08) 0%, transparent 35%),
+                radial-gradient(circle at 85% 75%, rgba(245, 208, 97, 0.05) 0%, transparent 40%);
             color: var(--text-main); 
-            min-height: 100vh; 
-            display: flex; 
-            overflow: hidden;
-        }
-
-        /* ================= SIDEBAR COMPONENT ================= */
-        .sidebar {
-            width: 330px;
-            background-color: var(--sidebar-bg);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border-right: 1px solid var(--border-color);
+            min-height: 100vh;
             display: flex;
             flex-direction: column;
+            overflow-x: hidden;
+        }
+
+        header {
+            padding: 20px 40px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
             justify-content: space-between;
-            padding: 25px;
-            height: 100vh;
-            flex-shrink: 0;
-            z-index: 10;
+            align-items: center;
+            background: rgba(10, 16, 32, 0.5);
+            backdrop-filter: blur(12px);
         }
+        .brand-logo { font-size: 22px; font-weight: 900; color: var(--primary); letter-spacing: 1px; text-shadow: 0 0 12px var(--primary-glow); }
+        .session-status { font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: var(--accent-gold); font-weight: bold; }
 
-        .brand-section { text-align: center; margin-bottom: 25px; border-bottom: 1px solid var(--border-color); padding-bottom: 20px; }
-        .brand-logo { font-size: 26px; font-weight: 900; color: var(--primary); letter-spacing: 1px; text-shadow: 0 0 15px var(--primary-glow); }
-        .brand-tagline { font-size: 10px; color: var(--accent-gold); text-transform: uppercase; letter-spacing: 3px; margin-top: 6px; font-weight: bold; }
-
-        .profile-setup-box {
-            background: var(--card-bg);
-            border: 1px solid var(--border-color);
-            border-radius: 14px;
-            padding: 20px;
-            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.4);
-        }
-        .profile-setup-box h3 { font-size: 13px; color: var(--accent-gold); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 14px; }
-
-        /* INTERACTIVE AUDIO WATERFALL */
-        .audio-widget {
-            background: rgba(15, 23, 42, 0.9);
-            border: 1px solid var(--border-color);
-            border-radius: 12px;
-            padding: 15px;
-            text-align: center;
-        }
-        .audio-title { font-size: 11px; font-weight: bold; color: var(--primary); margin-bottom: 8px; text-transform: uppercase; }
-        .audio-btn { background: var(--primary); border: none; padding: 8px 16px; border-radius: 20px; color: var(--bg-deep); font-size: 10px; font-weight: bold; cursor: pointer; }
-        
-        .wave-container { display: flex; justify-content: center; gap: 3px; height: 15px; margin-top: 12px; align-items: flex-end; }
-        .wave-bar { width: 3px; height: 3px; background-color: var(--primary); border-radius: 3px; }
-        .wave-container.playing .wave-bar { animation: jumpPulse 0.8s ease-in-out infinite alternate; }
-        .wave-container.playing .wave-bar:nth-child(2) { animation-delay: 0.15s; }
-        .wave-container.playing .wave-bar:nth-child(3) { animation-delay: 0.3s; }
-        @keyframes jumpPulse { 0% { height: 3px; } 100% { height: 15px; background-color: var(--accent-gold); } }
-
-        /* ================= MAIN DISPLAY CANVAS ================= */
-        .main-content {
+        .page-viewport {
             flex-grow: 1;
-            padding: 40px;
-            overflow-y: auto;
-            height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
-            z-index: 5;
-        }
-        .content-container { width: 100%; max-width: 880px; }
-
-        /* PAGE 1: STEALTH LANDING VIEW SCREEN */
-        .page-stage { width: 100%; }
-        #pageLandingStage { display: flex; justify-content: center; align-items: center; }
-        
-        .stealth-lock-card {
-            background: rgba(13, 20, 36, 0.3);
-            border: 2px dashed var(--border-color);
-            border-radius: 20px;
-            padding: 60px 40px;
-            text-align: center;
-            color: var(--text-muted);
-            max-width: 580px;
-            backdrop-filter: blur(6px);
-        }
-        .stealth-lock-card h2 { color: #fff; margin-bottom: 12px; font-size: 22px; }
-
-        /* PAGE 2: REAL-TIME SECURE ECOSYSTEM SHEET VIEW */
-        #pageDashboardStage { display: none; }
-        
-        .welcome-hero {
-            text-align: center;
-            padding: 40px 30px;
-            background: linear-gradient(135deg, rgba(20, 33, 61, 0.7) 0%, rgba(10, 15, 28, 0.9) 100%);
-            border-radius: 20px;
-            border: 1px solid var(--border-color);
-            margin-bottom: 30px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.4);
-            animation: slideUpTransition 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-        }
-        .welcome-hero h1 { font-size: 34px; font-weight: 800; color: #fff; margin-bottom: 10px; }
-        .welcome-hero h1 span { color: var(--primary); text-shadow: 0 0 20px var(--primary-glow); }
-        .welcome-hero p { color: var(--text-muted); font-size: 14px; max-width: 600px; margin: 0 auto; }
-
-        /* Multi-Category Grid */
-        .course-sectors-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; margin-bottom: 30px; }
-        .sector-card { background: var(--card-bg); border: 1px solid var(--border-color); padding: 18px; border-radius: 12px; text-align: center; }
-        .sector-icon { font-size: 24px; margin-bottom: 10px; }
-        .sector-card h4 { font-size: 14px; color: #fff; margin-bottom: 4px; }
-        .sector-card span { font-size: 11px; color: var(--text-muted); display: block; }
-
-        /* DATA SHEET CARDS STRUCTURE */
-        .talent-sheet-wrapper { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 16px; padding: 30px; }
-        .cards-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 2<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AuraPulse - Interactive Talent Matrix</title>
-    <style>
-        :root {
-            --bg-deep: #050811;
-            --sidebar-bg: rgba(10, 16, 32, 0.9);
-            --card-bg: rgba(20, 32, 58, 0.55);
-            --primary: #a1e3f9;
-            --primary-glow: rgba(161, 227, 249, 0.25);
-            --accent-gold: #f5d061;
-            --text-main: #ffffff;
-            --text-muted: #8da2cc;
-            --input-bg: #15223d;
-            --border-color: rgba(35, 53, 92, 0.6);
-            --accent-red: #ff5e62;
-            --success: #2ec4b6;
+            padding: 40px 20px;
+            width: 100%;
         }
 
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', system-ui, sans-serif; }
-        
-        body { 
-            background-color: var(--bg-deep); 
-            background-image: 
-                radial-gradient(circle at 15% 25%, rgba(161, 227, 249, 0.07) 0%, transparent 35%),
-                radial-gradient(circle at 85% 75%, rgba(245, 208, 97, 0.04) 0%, transparent 40%);
-            color: var(--text-main); 
-            min-height: 100vh; 
-            display: flex; 
-            overflow: hidden;
-        }
+        /* FRONT PAGE VIEWPORT */
+        #pageSetupView { display: flex; }
 
-        /* ================= SIDEBAR COMPONENT ================= */
-        .sidebar {
-            width: 330px;
-            background-color: var(--sidebar-bg);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border-right: 1px solid var(--border-color);
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            padding: 25px;
-            height: 100vh;
-            flex-shrink: 0;
-            z-index: 10;
-        }
-
-        .brand-section { text-align: center; margin-bottom: 25px; border-bottom: 1px solid var(--border-color); padding-bottom: 20px; }
-        .brand-logo { font-size: 26px; font-weight: 900; color: var(--primary); letter-spacing: 1px; text-shadow: 0 0 15px var(--primary-glow); }
-        .brand-tagline { font-size: 10px; color: var(--accent-gold); text-transform: uppercase; letter-spacing: 3px; margin-top: 6px; font-weight: bold; }
-
-        .profile-setup-box {
+        .form-onboarding-card {
             background: var(--card-bg);
             border: 1px solid var(--border-color);
-            border-radius: 14px;
-            padding: 20px;
-            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.4);
-        }
-        .profile-setup-box h3 { font-size: 13px; color: var(--accent-gold); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 14px; }
-
-        /* INTERACTIVE AUDIO WATERFALL */
-        .audio-widget {
-            background: rgba(15, 23, 42, 0.9);
-            border: 1px solid var(--border-color);
-            border-radius: 12px;
-            padding: 15px;
-            text-align: center;
-        }
-        .audio-title { font-size: 11px; font-weight: bold; color: var(--primary); margin-bottom: 8px; text-transform: uppercase; }
-        .audio-btn { background: var(--primary); border: none; padding: 8px 16px; border-radius: 20px; color: var(--bg-deep); font-size: 10px; font-weight: bold; cursor: pointer; }
-        
-        .wave-container { display: flex; justify-content: center; gap: 3px; height: 15px; margin-top: 12px; align-items: flex-end; }
-        .wave-bar { width: 3px; height: 3px; background-color: var(--primary); border-radius: 3px; }
-        .wave-container.playing .wave-bar { animation: jumpPulse 0.8s ease-in-out infinite alternate; }
-        .wave-container.playing .wave-bar:nth-child(2) { animation-delay: 0.15s; }
-        .wave-container.playing .wave-bar:nth-child(3) { animation-delay: 0.3s; }
-        @keyframes jumpPulse { 0% { height: 3px; } 100% { height: 15px; background-color: var(--accent-gold); } }
-
-        /* ================= MAIN DISPLAY CANVAS ================= */
-        .main-content {
-            flex-grow: 1;
+            border-radius: 166px;
+            border-radius: 16px;
             padding: 40px;
-            overflow-y: auto;
-            height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 5;
+            width: 100%;
+            max-width: 680px;
+            box-shadow: 0 15px 50px rgba(0,0,0,0.5);
+            backdrop-filter: blur(8px);
         }
-        .content-container { width: 100%; max-width: 880px; }
+        .form-onboarding-card h2 { font-size: 24px; margin-bottom: 6px; color: #fff; letter-spacing: 0.5px; }
+        .form-onboarding-card p { font-size: 14px; color: var(--text-muted); margin-bottom: 25px; }
 
-        /* PAGE 1: STEALTH LANDING VIEW SCREEN */
-        .page-stage { width: 100%; }
-        #pageLandingStage { display: flex; justify-content: center; align-items: center; }
+        .form-grid-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px; }
+        @media (max-width: 600px) { .form-grid-layout { grid-template-columns: 1fr; } }
         
-        .stealth-lock-card {
-            background: rgba(13, 20, 36, 0.3);
-            border: 2px dashed var(--border-color);
-            border-radius: 20px;
-            padding: 60px 40px;
-            text-align: center;
-            color: var(--text-muted);
-            max-width: 580px;
-            backdrop-filter: blur(6px);
-        }
-        .stealth-lock-card h2 { color: #fff; margin-bottom: 12px; font-size: 22px; }
+        .form-group { display: flex; flex-direction: column; gap: 8px; }
+        .form-group.full-span { grid-column: 1 / -1; }
+        label { font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; }
+        input, select, textarea { background-color: var(--input-bg); border: 1px solid var(--border-color); padding: 12px 14px; border-radius: 8px; color: var(--text-main); font-size: 14px; width: 100%; }
+        input:focus, select:focus, textarea:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 8px var(--primary-glow); }
+        textarea { height: 100px; resize: none; }
 
-        /* PAGE 2: REAL-TIME SECURE ECOSYSTEM SHEET VIEW */
-        #pageDashboardStage { display: none; }
-        
-        .welcome-hero {
-            text-align: center;
-            padding: 40px 30px;
-            background: linear-gradient(135deg, rgba(20, 33, 61, 0.7) 0%, rgba(10, 15, 28, 0.9) 100%);
+        /* NEXT INTERACTIVE HUB PAGE */
+        #pageDashboardView { display: none; align-items: flex-start; }
+        .dashboard-container { width: 100%; max-width: 1040px; margin: 0 auto; animation: pageShiftAnimation 0.5s ease-out forwards; }
+        @keyframes pageShiftAnimation { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+        .welcome-hero-banner {
+            padding: 45px 35px;
+            background: linear-gradient(135deg, rgba(20, 33, 61, 0.8) 0%, rgba(10, 15, 28, 0.95) 100%);
             border-radius: 20px;
             border: 1px solid var(--border-color);
-            margin-bottom: 30px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.4);
-            animation: slideUpTransition 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            margin-bottom: 35px;
+            text-align: center;
         }
-        .welcome-hero h1 { font-size: 34px; font-weight: 800; color: #fff; margin-bottom: 10px; }
-        .welcome-hero h1 span { color: var(--primary); text-shadow: 0 0 20px var(--primary-glow); }
-        .welcome-hero p { color: var(--text-muted); font-size: 14px; max-width: 600px; margin: 0 auto; }
+        .welcome-hero-banner h1 { font-size: 36px; font-weight: 800; color: #fff; margin-bottom: 10px; }
+        .welcome-hero-banner h1 span { color: var(--primary); text-shadow: 0 0 25px var(--primary-glow); }
+        .welcome-hero-banner p { color: var(--text-muted); font-size: 15px; }
 
-        /* Multi-Category Grid */
-        .course-sectors-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; margin-bottom: 30px; }
-        .sector-card { background: var(--card-bg); border: 1px solid var(--border-color); padding: 18px; border-radius: 12px; text-align: center; }
-        .sector-icon { font-size: 24px; margin-bottom: 10px; }
-        .sector-card h4 { font-size: 14px; color: #fff; margin-bottom: 4px; }
-        .sector-card span { font-size: 11px; color: var(--text-muted); display: block; }
+        .showcase-display-headline { font-size: 18px; color: var(--accent-gold); margin-bottom: 15px; text-transform: uppercase; font-weight: bold; }
+        .profiles-example-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 25px; margin-bottom: 40px; }
+        
+        .profile-example-card { 
+            background: var(--card-bg); 
+            border: 1px solid var(--border-color); 
+            border-radius: 14px; 
+            padding: 25px;
+            border-top: 4px solid var(--primary);
+        }
+        .profile-example-card.role-lecturer { border-top-color: var(--accent-gold); }
+        
+        .card-badge { display: inline-block; padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: bold; margin-bottom: 14px; text-transform: uppercase; }
+        .card-badge.badge-student { background: rgba(161, 227, 249, 0.1); color: var(--primary); }
+        .card-badge.badge-lecturer { background: rgba(245, 208, 97, 0.1); color: var(--accent-gold); }
+        
+        .profile-example-card h3 { font-size: 18px; color: #fff; margin-bottom: 6px; }
+        .profile-example-card p { font-size: 13.5px; color: #cbd5e1; line-height: 1.6; }
 
-        /* DATA SHEET CARDS STRUCTURE */
-        .talent-sheet-wrapper { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 16px; padding: 30px; }
-        .cards-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 2
+        .btn { width: 100%; padding: 14px; border-radius: 8px; font-weight: bold; cursor: pointer; border: none; font-size: 14px; display: inline-flex; align-items: center; justify-content: center; }
+        .btn-primary { background-color: var(--primary); color: var(--bg-deep); font-weight: 800; }
+        .btn-secondary { background: transparent; border: 1px solid var(--border-color); color: var(--text-muted); width: auto; padding: 10px 20px; margin-top: 20px; }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="brand-logo">✨ AuraPulse</div>
+        <div class="session-status" id="txtSystemGlobalBadge">🛡️ Status: Security Standby Vault</div>
+    </header>
+
+    <div class="page-viewport" id="pageSetupView">
+        <div class="form-onboarding-card">
+            <h2>Initialize Identity Profile</h2>
+            <p>Design your system profile parameters below to pass authentication and switch to your dashboard.</p>
+            
+            <div class="form-grid-layout">
+                <div class="form-group">
+                    <label for="inputProfileName">Full Account Handle / Name</label>
+                    <input type="text" id="inputProfileName" placeholder="Type individual name...">
+                </div>
+
+                <div class="form-group">
+                    <label for="inputProfileRole">System Profile Assignment Category</label>
+                    <select id="inputProfileRole">
+                        <option value="student">Student Account Track</option>
+                        <option value="lecturer">Faculty Lecturer / Evaluator</option>
+                    </select>
+                </div>
+
+                <div class="form-group full-span">
+                    <label for="inputProfileDomain">Core Creative/Scientific Focus Domain</label>
+                    <select id="inputProfileDomain">
+                        <option value="Academic Exploration & Complex Research">Academic Exploration & Complex Research</option>
+                        <option value="Symphonic Track Arrangements & Music">Symphonic Track Arrangements & Music</option>
+                        <option value="Theatrical Formats & Dance Choreography">Theatrical Formats & Dance Choreography</option>
+                        <option value="UI/UX Engineering & Digital Innovation">UI/UX Engineering & Digital Innovation</option>
+                    </select>
+                </div>
+
+                <div class="form-group full-span">
+                    <label for="inputProfileBio">Bio Overview Narrative Summary</label>
+                    <textarea id="inputProfileBio" placeholder="Hi, I am ready..."></textarea>
+                </div>
+            </div>
+
+            <button type="button" class="btn btn-primary" onclick="processLocalNavigationSequence()">Compile Profile Deck & Enter Hub →</button>
+        </div>
+    </div>
+
+    <div class="page-viewport" id="pageDashboardView">
+        <div class="dashboard-container">
+            
+            <div class="welcome-hero-banner">
+                <h1>Hello, <span id="lblTargetDynamicUserGreeting">Visitor</span>! Welcome to AuraPulse</h1>
+                <p>System signature initialized. Displaying live cluster rows matching your exact focus channel.</p>
+            </div>
+
+            <div>
+                <div class="showcase-display-headline" id="lblSelectedDomainTitle">Indexed Profiles</div>
+                <div class="profiles-example-grid" id="containerProfilesInjectPool">
+                    </div>
+            </div>
+
+            <button type="button" class="btn btn-secondary" onclick="returnToSetupViewPage()">← Return and Modify Identity Key</button>
+
+        </div>
+    </div>
+
+    <script>
+        // System Data Registry Model
+        const realisticProfilesDatabase = [
+            { name: "Student ABC (Aarav Sharma)", role: "student", domain: "Academic Exploration & Complex Research", details: "UID: AP-2026-9041. Logged multi-variable data array graphs mapping solar telemetry patterns." },
+            { name: "Dr. Aris Vance (Example Faculty)", role: "lecturer", domain: "Academic Exploration & Complex Research", details: "Senior Lead Research Evaluator. Managing distributed cloud laboratory clusters." },
+            { name: "Student XYZ (Priya Nair)", role: "student", domain: "Academic Exploration & Complex Research", details: "UID: AP-2026-4412. Documenting structural quantum code matrices and telemetry layout networks." },
+            { name: "Student ABC (Rohan Malhotra)", role: "student", domain: "Symphonic Track Arrangements & Music", details: "UID: AP-2026-1182. Uploaded acoustic waveform records featuring automated composition modules." },
+            { name: "Professor Clara Thorne (Example Faculty)", role: "lecturer", domain: "Symphonic Track Arrangements & Music", details: "Department Director of Orchestral Studies. Tracking active composition indices." },
+            { name: "Student XYZ (Emily Chen)", role: "student", domain: "Theatrical Formats & Dance Choreography", details: "UID: AP-2026-3091. Developed responsive theatrical fusion timeline mapping fluid movement sequences." },
+            { name: "Maestro Julian Kincaid (Example Faculty)", role: "lecturer", domain: "Theatrical Formats & Dance Choreography", details: "Performance Coach. Analyzing visual coordination files and tracking status badges." },
+            { name: "Student ABC (Marcus Miller)", role: "student", domain: "UI/UX Engineering & Digital Innovation", details: "UID: AP-2026-7731. Produced functional design layouts highlighting responsive glassmorphic interface fields." },
+            { name: "Director Sarah Jenkins (Example Faculty)", role: "lecturer", domain: "UI/UX Engineering & Digital Innovation", details: "Interactive Product Advisor. Inspecting structural front-end system frameworks." }
+        ];
+
+        function processLocalNavigationSequence() {
+            const nameVal = document.getElementById('inputProfileName').value.trim();
+            const roleVal = document.getElementById('inputProfileRole').value;
+            const domainVal = document.getElementById('inputProfileDomain').value;
+            const bioVal = document.getElementById('inputProfileBio').value.trim();
+
+            if (!nameVal || !bioVal) {
+                alert("Input Error: Please provide both your Handle Name and Biography summary.");
+                return;
+            }
+
+            // Route Data to User Display Fields
+            document.getElementById('txtSystemGlobalBadge').innerText = `📡 Link Online: ${nameVal.toUpperCase()} (${roleVal.toUpperCase()})`;
+            document.getElementById('lblTargetDynamicUserGreeting').innerText = nameVal;
+            document.getElementById('lblSelectedDomainTitle').innerText = `📁 Current Channel Profiles: ${domainVal}`;
+            
+            const pool = document.getElementById('containerProfilesInjectPool');
+            pool.innerHTML = ""; 
+
+            // Filter profile examples matching user chosen track
+            const filtered = realisticProfilesDatabase.filter(item => item.domain === domainVal);
+            
+            filtered.forEach(p => {
+                const card = document.createElement('div');
+                card.className = `profile-example-card ${p.role === 'lecturer' ? 'role-lecturer' : ''}`;
+                card.innerHTML = `
+                    <span class="card-badge ${p.role === 'student' ? 'badge-student' : 'badge-lecturer'}">
+                        ${p.role === 'student' ? '🎓 Student Registry' : '🔑 Lecturer Profile'}
+                    </span>
+                    <h3>${p.name}</h3>
+                    <p>${p.details}</p>
+                `;
+                pool.appendChild(card);
+            });
+
+            // Page Navigation Flip
+            document.getElementById('pageSetupView').style.display = 'none';
+            document.getElementById('pageDashboardView').style.display = 'flex';
+        }
+
+        function returnToSetupViewPage() {
+            document.getElementById('pageDashboardView').style.display = 'none';
+            document.getElementById('pageSetupView').style.display = 'flex';
+            document.getElementById('txtSystemGlobalBadge').innerText = "🛡️ Status: Security Standby Vault";
+        }
+    </script>
+</body>
+</html>
