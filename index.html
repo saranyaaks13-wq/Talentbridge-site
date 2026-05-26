@@ -1,65 +1,1553 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>AuraPulse Fix</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AuraPulse - Interactive Program Matrix</title>
     <style>
-        body { background: #05050d; color: white; font-family: sans-serif; display: flex; }
-        .sidebar { width: 250px; background: #0d1122; height: 100vh; padding: 20px; }
-        .main { padding: 40px; color: white; }
-        .box { background: #1a1f35; padding: 20px; border-radius: 10px; border: 1px solid #333; }
-        h1 { color: #00f0ff; }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', system-ui, sans-serif; }
+        
+        body { 
+            background-color: #030611; 
+            color: #ffffff; 
+            min-height: 100vh;
+            display: flex;
+            overflow: hidden;
+        }
+
+        /* ================= SIDEBAR NAVIGATION ================= */
+        .sidebar {
+            width: 280px;
+            background-color: #060b18;
+            border-right: 1px solid #1e2d50;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            padding: 30px 20px;
+            flex-shrink: 0;
+        }
+
+        .brand-section { margin-bottom: 35px; text-align: left; padding-left: 10px; }
+        .brand-logo { font-size: 26px; font-weight: 800; color: #a1e3f9; letter-spacing: 0.5px; }
+        .brand-tagline { font-size: 11px; color: #f5d061; text-transform: uppercase; margin-top: 6px; letter-spacing: 1px; font-weight: 600; }
+        .brand-subtext { font-size: 12px; color: #64748b; margin-top: 4px; font-style: italic; }
+        
+        .nav-links-list { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+        .nav-item { 
+            padding: 14px 16px; 
+            color: #94a3b8; 
+            border-radius: 10px; 
+            cursor: pointer; 
+            font-size: 14px; 
+            font-weight: 600;
+            background: rgba(255,255,255,0.01);
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .nav-item:hover { background: rgba(161, 227, 249, 0.08); color: #a1e3f9; }
+        .nav-item.active { background: rgba(161, 227, 249, 0.15); color: #a1e3f9; border-left: 4px solid #a1e3f9; }
+
+        /* ================= ROUTING VIEWS MANAGEMENT ================= */
+        .main-workspace {
+            flex-grow: 1;
+            padding: 35px;
+            overflow-y: auto;
+            height: 100vh;
+            background: radial-gradient(circle at 50% 0%, #0b1528 0%, #030611 70%);
+        }
+
+        .app-view-screen {
+            display: none; /* Controlled via active tab script routing */
+        }
+        .app-view-screen.active-view {
+            display: block;
+            animation: fadeIn 0.4s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ================= GORGEOUS GRAPHICAL HERO SCREEN ================= */
+        .inspiration-hero-card {
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            border: 1px solid #23355c;
+            border-radius: 20px;
+            padding: 35px;
+            margin-bottom: 35px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+        }
+        .hero-text-block { max-width: 65%; }
+        .inspiration-hero-card h2 { font-size: 26px; margin-bottom: 12px; color: #fff; font-weight: 800; }
+        .inspiration-hero-card h2 span { color: #a1e3f9; }
+        .inspiration-hero-card p { font-size: 14px; color: #94a3b8; line-height: 1.6; }
+        
+        /* Modern Abstract Vector Geometric Graphic */
+        .hero-graphic-art {
+            width: 140px;
+            height: 140px;
+            background: linear-gradient(45deg, #a1e3f9, #c084fc);
+            border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%;
+            animation: waveMorph 8s ease-in-out infinite alternate;
+            box-shadow: 0 0 30px rgba(161, 227, 249, 0.3);
+            flex-shrink: 0;
+        }
+        @keyframes waveMorph {
+            0% { border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%; }
+            100% { border-radius: 50% 50% 30% 70% / 50% 60% 40% 60%; }
+        }
+
+        /* VISUAL SECTORS GRID */
+        .visual-sectors-row {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            margin-bottom: 35px;
+        }
+        @media (max-width: 800px) { .visual-sectors-row { grid-template-columns: repeat(2, 1fr); } }
+        
+        .sector-badge-card {
+            background: rgba(17, 26, 48, 0.6);
+            border: 1px solid #23355c;
+            padding: 20px 15px;
+            border-radius: 12px;
+            text-align: center;
+            transition: transform 0.2s;
+        }
+        .sector-badge-card:hover { transform: scale(1.03); border-color: #a1e3f9; }
+        .sector-badge-card .icon { font-size: 24px; margin-bottom: 8px; display: block; }
+        .sector-badge-card h4 { font-size: 13px; color: #fff; font-weight: 600; }
+
+        /* SEARCH FILTERS ROW */
+        .top-action-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            background: #0d162c;
+            padding: 15px 25px;
+            border-radius: 14px;
+            border: 1px solid #23355c;
+        }
+        .search-input { 
+            background: #0b1329; 
+            border: 1px solid #23355c; 
+            padding: 12px 20px; 
+            border-radius: 25px; 
+            color: #fff; 
+            font-size: 14px; 
+            width: 380px;
+        }
+        .search-input:focus { outline: none; border-color: #a1e3f9; }
+        .system-badge { color: #2ec4b6; font-size: 12px; font-weight: bold; text-transform: uppercase; }
+
+        /* DUAL LAYOUT COLS GROUP */
+        .dashboard-columns-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+        }
+        @media (max-width: 950px) { .dashboard-columns-grid { grid-template-columns: 1fr; } }
+
+        .column-panel {
+            background: #0b1224;
+            border: 1px solid #23355c;
+            border-radius: 16px;
+            padding: 25px;
+        }
+        .column-header { font-size: 15px; font-weight: bold; margin-bottom: 20px; display: flex; justify-content: space-between; border-bottom: 1px solid #23355c; padding-bottom: 12px; text-transform: uppercase; }
+        .column-header .counter-badge { font-size: 12px; background: rgba(255,255,255,0.05); padding: 2px 8px; border-radius: 10px; color: #a1e3f9; }
+
+        /* CARD AVATARS GRAPHICS LAYOUT */
+        .cards-flex-stack { display: flex; flex-direction: column; gap: 16px; }
+        
+        .pulse-card {
+            background: rgba(18, 30, 58, 0.45);
+            border: 1px solid #23355c;
+            border-radius: 14px;
+            padding: 20px;
+            display: flex;
+            gap: 16px;
+            align-items: flex-start;
+        }
+        
+        /* Interactive Profile Images */
+        .profile-avatar-frame {
+            width: 52px;
+            height: 52px;
+            border-radius: 50%;
+            background-color: #1e293b;
+            border: 2px solid #a1e3f9;
+            flex-shrink: 0;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .pulse-card.lecturer-type .profile-avatar-frame { border-color: #c084fc; }
+        
+        .profile-img-placeholder {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .card-body-content { flex-grow: 1; }
+        .pulse-card h4 { font-size: 16px; color: #fff; margin-bottom: 4px; }
+        
+        .domain-tag { font-size: 10px; color: #f5d061; font-weight: bold; text-transform: uppercase; margin-bottom: 8px; display: inline-block; border: 1px solid rgba(245, 208, 97, 0.3); padding: 2px 6px; border-radius: 4px; }
+        .pulse-card.lecturer-type .domain-tag { color: #c084fc; border-color: rgba(192, 132, 252, 0.3); }
+        
+        .pulse-card p { font-size: 13px; color: #94a3b8; line-height: 1.5; }
+
+        /* ================= CONFIGURATION PROFILE FORM SCREEN ================= */
+        .form-container-card {
+            background: #0b1224;
+            border: 1px solid #23355c;
+            border-radius: 16px;
+            padding: 35px;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        .form-container-card h3 { font-size: 20px; margin-bottom: 8px; color: #fff; }
+        .form-container-card p { font-size: 13px; color: #94a3b8; margin-bottom: 24px; }
+
+        /* ================= REGISTRATION MODAL FORM OVERLAY ================= */
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(3, 5, 17, 0.9); display: none; justify-content: center; align-items: center; z-index: 100; backdrop-filter: blur(5px); }
+        .modal-card { background: #0c152b; border: 1px solid #23355c; padding: 35px; border-radius: 16px; width: 420px; }
+        .modal-card h3 { margin-bottom: 18px; color: #fff; font-size: 18px; border-bottom: 1px solid #23355c; padding-bottom: 10px; }
+        
+        .form-group { display: flex; flex-direction: column; gap: 6px; margin-bottom: 16px; }
+        .form-group label { font-size: 11px; color: #94a3b8; font-weight: bold; text-transform: uppercase; }
+        .form-group input, .form-group select { background: #030611; border: 1px solid #23355c; padding: 12px; border-radius: 8px; color: #fff; font-size: 13px; }
+        .form-group input:focus { outline: none; border-color: #a1e3f9; }
+        
+        .modal-actions { display: flex; gap: 10px; margin-top: 25px; }
+        .btn-modal-save { background: #a1e3f9; color: #030611; border: none; padding: 12px; font-weight: bold; cursor: pointer; flex-grow: 1; border-radius: 6px; font-size: 13px; }
+        .btn-modal-close { background: transparent; color: #94a3b8; border: 1px solid #23355c; padding: 12px; cursor: pointer; border-radius: 6px; }
     </style>
 </head>
 <body>
 
     <div class="sidebar">
-        <h2>AuraPulse</h2>
-        <p onclick="location.reload()" style="cursor:pointer; color: #aaa;">Click to Reload</p>
+        <div class="brand-section">
+            <div class="brand-logo">AuraPulse</div>
+            <div class="brand-tagline">Talent System Network</div>
+            <div class="brand-subtext">Designed for Creative Progress</div>
+        </div>
+        <ul class="nav-links-list">
+            <li class="nav-item active" id="btnNavHome" onclick="routeToScreen('home')">Home Dashboard</li>
+            <li class="nav-item" id="btnNavConfig" onclick="routeToScreen('config')">Profile Config</li>
+            <li class="nav-item" id="btnNavPrograms" onclick="routeToScreen('programs')">Selected Programs</li>
+            <li class="nav-item" style="margin-top: 25px; border: 1px dashed #a1e3f9; color: #a1e3f9; justify-content: center;" onclick="openRegistrationModal()">+ Quick Register</li>
+        </ul>
     </div>
 
-    <div class="main">
-        <div class="box">
-            <h1>System Operational</h1>
-            <p>If you can see this text, the browser is finally allowing the code to render.</p>
-            <p id="debug-msg"></p>
+    <div class="main-workspace">
+
+        <div id="viewScreenHome" class="app-view-screen active-view">
+            
+            <div class="inspiration-hero-card">
+                <div class="hero-text-block">
+                    <h2>Welcome to the <span>AuraPulse Workspace Hub</span></h2>
+                    <p>"Creativity is the blueprint of human progression. Whether you are mapping out advanced scientific models, choreographing performance physics, or synthesizing audio waves, excellence relies on shared visibility. This terminal serves as a live, frictionless network where students and evaluating lecturers connect directly without onboarding boundaries."</p>
+                </div>
+                <div class="hero-graphic-art"></div>
+            </div>
+
+            <div class="visual-sectors-row">
+                <div class="sector-badge-card"><span class="icon">📚</span><h4>Academic Research</h4></div>
+                <div class="sector-badge-card"><span class="icon">💃</span><h4>Performance Physics</h4></div>
+                <div class="sector-badge-card"><span class="icon">🎨</span><h4>UI/UX Design Graphics</h4></div>
+                <div class="sector-badge-card"><span class="icon">🔬</span><h4>Quantum Computation</h4></div>
+            </div>
+
+            <div class="top-action-bar">
+                <input type="text" class="search-input" id="txtDashboardGlobalSearch" placeholder="Search by names, domains, or keywords..." onkeyup="filterTalentMatrixRows()">
+                <div class="system-badge">Ecosystem Status: Active</div>
+            </div>
+
+            <div class="dashboard-columns-grid">
+                <div class="column-panel">
+                    <div class="column-header">
+                        <div>Registered Active Students</div>
+                        <div id="lblStudentCount" class="counter-badge">Count: 0</div>
+                    </div>
+                    <div class="cards-flex-stack" id="deckStudentsContainerPool"></div>
+                </div>
+
+                <div class="column-panel">
+                    <div class="column-header">
+                        <div>Available Faculty Lecturers</div>
+                        <div id="lblLecturerCount" class="counter-badge">Count: 0</div>
+                    </div>
+                    <div class="cards-flex-stack" id="deckLecturersContainerPool"></div>
+                </div>
+            </div>
+        </div>
+
+        <div id="viewScreenConfig" class="app-view-screen">
+            <div class="form-container-card">
+                <h3>👤 Profile Node Settings</h3>
+                <p>Modify and scale your infrastructure signature attributes below to synchronize token tracks.</p>
+                
+                <div class="form-group">
+                    <label>Ecosystem Access Handle Name</label>
+                    <input type="text" value="Administrator Core Workspace" placeholder="Enter target profile title name...">
+                </div>
+                <div class="form-group">
+                    <label>Active Domain Matrix Track</label>
+                    <select>
+                        <option>Quantum Computation Lab</option>
+                        <option>UI/UX Design & Frontend Graphics</option>
+                        <option>Performance Arts & Choreography Physics</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Terminal Contact Authentication Metadata</label>
+                    <input type="text" value="admin@aurapulse-matrix.net">
+                </div>
+                <button type="button" class="btn-modal-save" style="margin-top: 15px;" onclick="saveConfigConfirmation()">Update Network Token</button>
+            </div>
+        </div>
+
+        <div id="viewScreenPrograms" class="app-view-screen">
+            <div class="inspiration-hero-card" style="background: #111a30;">
+                <div class="hero-text-block" style="max-width: 100%;">
+                    <h2>📂 Selected Cluster Programs Tracking Sheet</h2>
+                    <p>Displaying live system telemetry queues reserved explicitly by your user track. Here you can trace isolated academic code updates and sync performance reviews.</p>
+                </div>
+            </div>
+            
+            <div class="column-panel">
+                <div class="column-header">Active Selected Matrix Pipeline</div>
+                <p style="color: #94a3b8; font-size: 14px; text-align: center; padding: 40px 0;">No tracks pinned. Click "Track Log Module" on the dashboard grid to populate this channel segment stream instantly.</p>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="modal-overlay" id="registrationModalBlock">
+        <div class="modal-card">
+            <h3>Quick Registry</h3>
+            <div class="form-group">
+                <label>Target Candidate Full Name</label>
+                <input type="text" id="regFormName" placeholder="e.g. Scholar ABC">
+            </div>
+            <div class="form-group">
+                <label>Account Assignment Track</label>
+                <select id="regFormRole">
+                    <option value="student">Student Registry File</option>
+                    <option value="lecturer">Faculty Profile</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Ecosystem Focus Domain</label>
+                <select id="regFormDomain">
+                    <option value="Academic Exploration">Academic Exploration</option>
+                    <option value="Dance Choreography">Dance Choreography</option>
+                    <option value="UI & Graphics Design">UI & Graphics Design</option>
+                    <option value="Symphonic Music Tracks">Symphonic Music Tracks</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Portfolio Log Details</label>
+                <input type="text" id="regFormDetails" placeholder="Type info narrative logs details here...">
+            </div>
+            <div class="modal-actions">
+                <button type="button" class="btn-modal-close" onclick="closeRegistrationModal()">Cancel</button>
+                <button type="button" class="btn-modal-save" onclick="commitRegistrationEntry()">Inject Entry Node</button>
+            </div>
         </div>
     </div>
 
-    <script>
-        document.getElementById('debug-msg').innerText = "Status: Script engine active at " + new Date().toLocaleTimeString();
-    </script>
+<script>
+    // System Data Array Core Modules Setup Records
+    var dynamicEcosystemDatabase = [
+        // STUDENT LIST IMAGES ARRAYS
+        { name: "Student ABC (Aarav Sharma)", role: "student", domain: "Academic Exploration", img: "https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?auto=format&fit=crop&w=100&q=80", details: "UID: AP-2026-9041. Logged multi-variable data array graphs mapping complex research streams." },
+        { name: "Student XYZ (Priya Nair)", role: "student", domain: "Quantum Lab", img: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=100&q=80", details: "UID: AP-2026-4412. Documenting structural quantum code matrices and telemetry logging networks." },
+        { name: "Student ABC (Rohan Malhotra)", role: "student", domain: "Symphonic Music Tracks", img: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=100&q=80", details: "UID: AP-2026-1182. Uploaded acoustic waveform audio records featuring midi mapping logs." },
+        { name: "Student XYZ (Emily Chen)", role: "student", domain: "Dance Choreography", img: "https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=100&q=80", details: "UID: AP-2026-3091. Developed responsive theatrical fusion timeline movement tracking maps." },
+        
+        // LECTURER LIST IMAGES ARRAYS
+        { name: "Dr. Aris Vance", role: "lecturer", domain: "Academic Exploration", img: "https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&w=100&q=80", details: "Senior Lead Research Evaluator. Managing distributed cloud laboratory modules and research thesis metrics." },
+        { name: "Professor Clara Thorne", role: "lecturer", domain: "Symphonic Music Tracks", img: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=100&q=80", details: "Department Director of Orchestral Studies. Tracking active composition performance track indices." },
+        { name: "Maestro Julian Kincaid", role: "lecturer", domain: "Dance Choreography", img: "https://images.unsplash.com/photo-1492562080023-ab3db95bfbce?auto=format&fit=crop&w=100&q=80", details: "Performance Coach. Analyzing visual coordination files, rhythmic step files, and evaluation sheets." },
+        { name: "Director Sarah Jenkins", role: "lecturer", domain: "UI & Graphics Design", img: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=100&q=80", details: "Interactive Product Advisor. Inspecting structural front-end framework system files and digital asset links." }
+    ];
 
-</body>
-</html><!DOCTYPE html>
-<html>
+    window.onload = function() {
+        renderEcosystemMatrix();
+    };<!DOCTYPE html>
+<html lang="en">
 <head>
-    <title>AuraPulse Fix</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AuraPulse - Interactive Program Matrix</title>
     <style>
-        body { background: #05050d; color: white; font-family: sans-serif; display: flex; }
-        .sidebar { width: 250px; background: #0d1122; height: 100vh; padding: 20px; }
-        .main { padding: 40px; color: white; }
-        .box { background: #1a1f35; padding: 20px; border-radius: 10px; border: 1px solid #333; }
-        h1 { color: #00f0ff; }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', system-ui, sans-serif; }
+        
+        body { 
+            background-color: #030611; 
+            color: #ffffff; 
+            min-height: 100vh;
+            display: flex;
+            overflow: hidden;
+        }
+
+        /* ================= SIDEBAR NAVIGATION ================= */
+        .sidebar {
+            width: 280px;
+            background-color: #060b18;
+            border-right: 1px solid #1e2d50;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            padding: 30px 20px;
+            flex-shrink: 0;
+        }
+
+        .brand-section { margin-bottom: 35px; text-align: left; padding-left: 10px; }
+        .brand-logo { font-size: 26px; font-weight: 800; color: #a1e3f9; letter-spacing: 0.5px; }
+        .brand-tagline { font-size: 11px; color: #f5d061; text-transform: uppercase; margin-top: 6px; letter-spacing: 1px; font-weight: 600; }
+        .brand-subtext { font-size: 12px; color: #64748b; margin-top: 4px; font-style: italic; }
+        
+        .nav-links-list { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+        .nav-item { 
+            padding: 14px 16px; 
+            color: #94a3b8; 
+            border-radius: 10px; 
+            cursor: pointer; 
+            font-size: 14px; 
+            font-weight: 600;
+            background: rgba(255,255,255,0.01);
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .nav-item:hover { background: rgba(161, 227, 249, 0.08); color: #a1e3f9; }
+        .nav-item.active { background: rgba(161, 227, 249, 0.15); color: #a1e3f9; border-left: 4px solid #a1e3f9; }
+
+        /* ================= ROUTING VIEWS MANAGEMENT ================= */
+        .main-workspace {
+            flex-grow: 1;
+            padding: 35px;
+            overflow-y: auto;
+            height: 100vh;
+            background: radial-gradient(circle at 50% 0%, #0b1528 0%, #030611 70%);
+        }
+
+        .app-view-screen {
+            display: none; /* Controlled via active tab script routing */
+        }
+        .app-view-screen.active-view {
+            display: block;
+            animation: fadeIn 0.4s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ================= GORGEOUS GRAPHICAL HERO SCREEN ================= */
+        .inspiration-hero-card {
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            border: 1px solid #23355c;
+            border-radius: 20px;
+            padding: 35px;
+            margin-bottom: 35px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+        }
+        .hero-text-block { max-width: 65%; }
+        .inspiration-hero-card h2 { font-size: 26px; margin-bottom: 12px; color: #fff; font-weight: 800; }
+        .inspiration-hero-card h2 span { color: #a1e3f9; }
+        .inspiration-hero-card p { font-size: 14px; color: #94a3b8; line-height: 1.6; }
+        
+        /* Modern Abstract Vector Geometric Graphic */
+        .hero-graphic-art {
+            width: 140px;
+            height: 140px;
+            background: linear-gradient(45deg, #a1e3f9, #c084fc);
+            border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%;
+            animation: waveMorph 8s ease-in-out infinite alternate;
+            box-shadow: 0 0 30px rgba(161, 227, 249, 0.3);
+            flex-shrink: 0;
+        }
+        @keyframes waveMorph {
+            0% { border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%; }
+            100% { border-radius: 50% 50% 30% 70% / 50% 60% 40% 60%; }
+        }
+
+        /* VISUAL SECTORS GRID */
+        .visual-sectors-row {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            margin-bottom: 35px;
+        }
+        @media (max-width: 800px) { .visual-sectors-row { grid-template-columns: repeat(2, 1fr); } }
+        
+        .sector-badge-card {
+            background: rgba(17, 26, 48, 0.6);
+            border: 1px solid #23355c;
+            padding: 20px 15px;
+            border-radius: 12px;
+            text-align: center;
+            transition: transform 0.2s;
+        }
+        .sector-badge-card:hover { transform: scale(1.03); border-color: #a1e3f9; }
+        .sector-badge-card .icon { font-size: 24px; margin-bottom: 8px; display: block; }
+        .sector-badge-card h4 { font-size: 13px; color: #fff; font-weight: 600; }
+
+        /* SEARCH FILTERS ROW */
+        .top-action-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            background: #0d162c;
+            padding: 15px 25px;
+            border-radius: 14px;
+            border: 1px solid #23355c;
+        }
+        .search-input { 
+            background: #0b1329; 
+            border: 1px solid #23355c; 
+            padding: 12px 20px; 
+            border-radius: 25px; 
+            color: #fff; 
+            font-size: 14px; 
+            width: 380px;
+        }
+        .search-input:focus { outline: none; border-color: #a1e3f9; }
+        .system-badge { color: #2ec4b6; font-size: 12px; font-weight: bold; text-transform: uppercase; }
+
+        /* DUAL LAYOUT COLS GROUP */
+        .dashboard-columns-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+        }
+        @media (max-width: 950px) { .dashboard-columns-grid { grid-template-columns: 1fr; } }
+
+        .column-panel {
+            background: #0b1224;
+            border: 1px solid #23355c;
+            border-radius: 16px;
+            padding: 25px;
+        }
+        .column-header { font-size: 15px; font-weight: bold; margin-bottom: 20px; display: flex; justify-content: space-between; border-bottom: 1px solid #23355c; padding-bottom: 12px; text-transform: uppercase; }
+        .column-header .counter-badge { font-size: 12px; background: rgba(255,255,255,0.05); padding: 2px 8px; border-radius: 10px; color: #a1e3f9; }
+
+        /* CARD AVATARS GRAPHICS LAYOUT */
+        .cards-flex-stack { display: flex; flex-direction: column; gap: 16px; }
+        
+        .pulse-card {
+            background: rgba(18, 30, 58, 0.45);
+            border: 1px solid #23355c;
+            border-radius: 14px;
+            padding: 20px;
+            display: flex;
+            gap: 16px;
+            align-items: flex-start;
+        }
+        
+        /* Interactive Profile Images */
+        .profile-avatar-frame {
+            width: 52px;
+            height: 52px;
+            border-radius: 50%;
+            background-color: #1e293b;
+            border: 2px solid #a1e3f9;
+            flex-shrink: 0;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .pulse-card.lecturer-type .profile-avatar-frame { border-color: #c084fc; }
+        
+        .profile-img-placeholder {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .card-body-content { flex-grow: 1; }
+        .pulse-card h4 { font-size: 16px; color: #fff; margin-bottom: 4px; }
+        
+        .domain-tag { font-size: 10px; color: #f5d061; font-weight: bold; text-transform: uppercase; margin-bottom: 8px; display: inline-block; border: 1px solid rgba(245, 208, 97, 0.3); padding: 2px 6px; border-radius: 4px; }
+        .pulse-card.lecturer-type .domain-tag { color: #c084fc; border-color: rgba(192, 132, 252, 0.3); }
+        
+        .pulse-card p { font-size: 13px; color: #94a3b8; line-height: 1.5; }
+
+        /* ================= CONFIGURATION PROFILE FORM SCREEN ================= */
+        .form-container-card {
+            background: #0b1224;
+            border: 1px solid #23355c;
+            border-radius: 16px;
+            padding: 35px;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        .form-container-card h3 { font-size: 20px; margin-bottom: 8px; color: #fff; }
+        .form-container-card p { font-size: 13px; color: #94a3b8; margin-bottom: 24px; }
+
+        /* ================= REGISTRATION MODAL FORM OVERLAY ================= */
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(3, 5, 17, 0.9); display: none; justify-content: center; align-items: center; z-index: 100; backdrop-filter: blur(5px); }
+        .modal-card { background: #0c152b; border: 1px solid #23355c; padding: 35px; border-radius: 16px; width: 420px; }
+        .modal-card h3 { margin-bottom: 18px; color: #fff; font-size: 18px; border-bottom: 1px solid #23355c; padding-bottom: 10px; }
+        
+        .form-group { display: flex; flex-direction: column; gap: 6px; margin-bottom: 16px; }
+        .form-group label { font-size: 11px; color: #94a3b8; font-weight: bold; text-transform: uppercase; }
+        .form-group input, .form-group select { background: #030611; border: 1px solid #23355c; padding: 12px; border-radius: 8px; color: #fff; font-size: 13px; }
+        .form-group input:focus { outline: none; border-color: #a1e3f9; }
+        
+        .modal-actions { display: flex; gap: 10px; margin-top: 25px; }
+        .btn-modal-save { background: #a1e3f9; color: #030611; border: none; padding: 12px; font-weight: bold; cursor: pointer; flex-grow: 1; border-radius: 6px; font-size: 13px; }
+        .btn-modal-close { background: transparent; color: #94a3b8; border: 1px solid #23355c; padding: 12px; cursor: pointer; border-radius: 6px; }
     </style>
 </head>
 <body>
 
     <div class="sidebar">
-        <h2>AuraPulse</h2>
-        <p onclick="location.reload()" style="cursor:pointer; color: #aaa;">Click to Reload</p>
+        <div class="brand-section">
+            <div class="brand-logo">AuraPulse</div>
+            <div class="brand-tagline">Talent System Network</div>
+            <div class="brand-subtext">Designed for Creative Progress</div>
+        </div>
+        <ul class="nav-links-list">
+            <li class="nav-item active" id="btnNavHome" onclick="routeToScreen('home')">Home Dashboard</li>
+            <li class="nav-item" id="btnNavConfig" onclick="routeToScreen('config')">Profile Config</li>
+            <li class="nav-item" id="btnNavPrograms" onclick="routeToScreen('programs')">Selected Programs</li>
+            <li class="nav-item" style="margin-top: 25px; border: 1px dashed #a1e3f9; color: #a1e3f9; justify-content: center;" onclick="openRegistrationModal()">+ Quick Register</li>
+        </ul>
     </div>
 
-    <div class="main">
-        <div class="box">
-            <h1>System Operational</h1>
-            <p>If you can see this text, the browser is finally allowing the code to render.</p>
-            <p id="debug-msg"></p>
+    <div class="main-workspace">
+
+        <div id="viewScreenHome" class="app-view-screen active-view">
+            
+            <div class="inspiration-hero-card">
+                <div class="hero-text-block">
+                    <h2>Welcome to the <span>AuraPulse Workspace Hub</span></h2>
+                    <p>"Creativity is the blueprint of human progression. Whether you are mapping out advanced scientific models, choreographing performance physics, or synthesizing audio waves, excellence relies on shared visibility. This terminal serves as a live, frictionless network where students and evaluating lecturers connect directly without onboarding boundaries."</p>
+                </div>
+                <div class="hero-graphic-art"></div>
+            </div>
+
+            <div class="visual-sectors-row">
+                <div class="sector-badge-card"><span class="icon">📚</span><h4>Academic Research</h4></div>
+                <div class="sector-badge-card"><span class="icon">💃</span><h4>Performance Physics</h4></div>
+                <div class="sector-badge-card"><span class="icon">🎨</span><h4>UI/UX Design Graphics</h4></div>
+                <div class="sector-badge-card"><span class="icon">🔬</span><h4>Quantum Computation</h4></div>
+            </div>
+
+            <div class="top-action-bar">
+                <input type="text" class="search-input" id="txtDashboardGlobalSearch" placeholder="Search by names, domains, or keywords..." onkeyup="filterTalentMatrixRows()">
+                <div class="system-badge">Ecosystem Status: Active</div>
+            </div>
+
+            <div class="dashboard-columns-grid">
+                <div class="column-panel">
+                    <div class="column-header">
+                        <div>Registered Active Students</div>
+                        <div id="lblStudentCount" class="counter-badge">Count: 0</div>
+                    </div>
+                    <div class="cards-flex-stack" id="deckStudentsContainerPool"></div>
+                </div>
+
+                <div class="column-panel">
+                    <div class="column-header">
+                        <div>Available Faculty Lecturers</div>
+                        <div id="lblLecturerCount" class="counter-badge">Count: 0</div>
+                    </div>
+                    <div class="cards-flex-stack" id="deckLecturersContainerPool"></div>
+                </div>
+            </div>
+        </div>
+
+        <div id="viewScreenConfig" class="app-view-screen">
+            <div class="form-container-card">
+                <h3>👤 Profile Node Settings</h3>
+                <p>Modify and scale your infrastructure signature attributes below to synchronize token tracks.</p>
+                
+                <div class="form-group">
+                    <label>Ecosystem Access Handle Name</label>
+                    <input type="text" value="Administrator Core Workspace" placeholder="Enter target profile title name...">
+                </div>
+                <div class="form-group">
+                    <label>Active Domain Matrix Track</label>
+                    <select>
+                        <option>Quantum Computation Lab</option>
+                        <option>UI/UX Design & Frontend Graphics</option>
+                        <option>Performance Arts & Choreography Physics</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Terminal Contact Authentication Metadata</label>
+                    <input type="text" value="admin@aurapulse-matrix.net">
+                </div>
+                <button type="button" class="btn-modal-save" style="margin-top: 15px;" onclick="saveConfigConfirmation()">Update Network Token</button>
+            </div>
+        </div>
+
+        <div id="viewScreenPrograms" class="app-view-screen">
+            <div class="inspiration-hero-card" style="background: #111a30;">
+                <div class="hero-text-block" style="max-width: 100%;">
+                    <h2>📂 Selected Cluster Programs Tracking Sheet</h2>
+                    <p>Displaying live system telemetry queues reserved explicitly by your user track. Here you can trace isolated academic code updates and sync performance reviews.</p>
+                </div>
+            </div>
+            
+            <div class="column-panel">
+                <div class="column-header">Active Selected Matrix Pipeline</div>
+                <p style="color: #94a3b8; font-size: 14px; text-align: center; padding: 40px 0;">No tracks pinned. Click "Track Log Module" on the dashboard grid to populate this channel segment stream instantly.</p>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="modal-overlay" id="registrationModalBlock">
+        <div class="modal-card">
+            <h3>Quick Registry</h3>
+            <div class="form-group">
+                <label>Target Candidate Full Name</label>
+                <input type="text" id="regFormName" placeholder="e.g. Scholar ABC">
+            </div>
+            <div class="form-group">
+                <label>Account Assignment Track</label>
+                <select id="regFormRole">
+                    <option value="student">Student Registry File</option>
+                    <option value="lecturer">Faculty Profile</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Ecosystem Focus Domain</label>
+                <select id="regFormDomain">
+                    <option value="Academic Exploration">Academic Exploration</option>
+                    <option value="Dance Choreography">Dance Choreography</option>
+                    <option value="UI & Graphics Design">UI & Graphics Design</option>
+                    <option value="Symphonic Music Tracks">Symphonic Music Tracks</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Portfolio Log Details</label>
+                <input type="text" id="regFormDetails" placeholder="Type info narrative logs details here...">
+            </div>
+            <div class="modal-actions">
+                <button type="button" class="btn-modal-close" onclick="closeRegistrationModal()">Cancel</button>
+                <button type="button" class="btn-modal-save" onclick="commitRegistrationEntry()">Inject Entry Node</button>
+            </div>
         </div>
     </div>
 
-    <script>
-        document.getElementById('debug-msg').innerText = "Status: Script engine active at " + new Date().toLocaleTimeString();
-    </script>
+<script>
+    // System Data Array Core Modules Setup Records
+    var dynamicEcosystemDatabase = [
+        // STUDENT LIST IMAGES ARRAYS
+        { name: "Student ABC (Aarav Sharma)", role: "student", domain: "Academic Exploration", img: "https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?auto=format&fit=crop&w=100&q=80", details: "UID: AP-2026-9041. Logged multi-variable data array graphs mapping complex research streams." },
+        { name: "Student XYZ (Priya Nair)", role: "student", domain: "Quantum Lab", img: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=100&q=80", details: "UID: AP-2026-4412. Documenting structural quantum code matrices and telemetry logging networks." },
+        { name: "Student ABC (Rohan Malhotra)", role: "student", domain: "Symphonic Music Tracks", img: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=100&q=80", details: "UID: AP-2026-1182. Uploaded acoustic waveform audio records featuring midi mapping logs." },
+        { name: "Student XYZ (Emily Chen)", role: "student", domain: "Dance Choreography", img: "https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=100&q=80", details: "UID: AP-2026-3091. Developed responsive theatrical fusion timeline movement tracking maps." },
+        
+        // LECTURER LIST IMAGES ARRAYS
+        { name: "Dr. Aris Vance", role: "lecturer", domain: "Academic Exploration", img: "https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&w=100&q=80", details: "Senior Lead Research Evaluator. Managing distributed cloud laboratory modules and research thesis metrics." },
+        { name: "Professor Clara Thorne", role: "lecturer", domain: "Symphonic Music Tracks", img: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=100&q=80", details: "Department Director of Orchestral Studies. Tracking active composition performance track indices." },
+        { name: "Maestro Julian Kincaid", role: "lecturer", domain: "Dance Choreography", img: "https://images.unsplash.com/photo-1492562080023-ab3db95bfbce?auto=format&fit=crop&w=100&q=80", details: "Performance Coach. Analyzing visual coordination files, rhythmic step files, and evaluation sheets." },
+        { name: "Director Sarah Jenkins", role: "lecturer", domain: "UI & Graphics Design", img: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=100&q=80", details: "Interactive Product Advisor. Inspecting structural front-end framework system files and digital asset links." }
+    ];
 
-</body>
-</html>
+    window.onload = function() {
+        renderEcosystemMatrix();
+    };<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AuraPulse - Interactive Program Matrix</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', system-ui, sans-serif; }
+        
+        body { 
+            background-color: #030611; 
+            color: #ffffff; 
+            min-height: 100vh;
+            display: flex;
+            overflow: hidden;
+        }
+
+        /* ================= SIDEBAR NAVIGATION ================= */
+        .sidebar {
+            width: 280px;
+            background-color: #060b18;
+            border-right: 1px solid #1e2d50;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            padding: 30px 20px;
+            flex-shrink: 0;
+        }
+
+        .brand-section { margin-bottom: 35px; text-align: left; padding-left: 10px; }
+        .brand-logo { font-size: 26px; font-weight: 800; color: #a1e3f9; letter-spacing: 0.5px; }
+        .brand-tagline { font-size: 11px; color: #f5d061; text-transform: uppercase; margin-top: 6px; letter-spacing: 1px; font-weight: 600; }
+        .brand-subtext { font-size: 12px; color: #64748b; margin-top: 4px; font-style: italic; }
+        
+        .nav-links-list { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+        .nav-item { 
+            padding: 14px 16px; 
+            color: #94a3b8; 
+            border-radius: 10px; 
+            cursor: pointer; 
+            font-size: 14px; 
+            font-weight: 600;
+            background: rgba(255,255,255,0.01);
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .nav-item:hover { background: rgba(161, 227, 249, 0.08); color: #a1e3f9; }
+        .nav-item.active { background: rgba(161, 227, 249, 0.15); color: #a1e3f9; border-left: 4px solid #a1e3f9; }
+
+        /* ================= ROUTING VIEWS MANAGEMENT ================= */
+        .main-workspace {
+            flex-grow: 1;
+            padding: 35px;
+            overflow-y: auto;
+            height: 100vh;
+            background: radial-gradient(circle at 50% 0%, #0b1528 0%, #030611 70%);
+        }
+
+        .app-view-screen {
+            display: none; /* Controlled via active tab script routing */
+        }
+        .app-view-screen.active-view {
+            display: block;
+            animation: fadeIn 0.4s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ================= GORGEOUS GRAPHICAL HERO SCREEN ================= */
+        .inspiration-hero-card {
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            border: 1px solid #23355c;
+            border-radius: 20px;
+            padding: 35px;
+            margin-bottom: 35px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+        }
+        .hero-text-block { max-width: 65%; }
+        .inspiration-hero-card h2 { font-size: 26px; margin-bottom: 12px; color: #fff; font-weight: 800; }
+        .inspiration-hero-card h2 span { color: #a1e3f9; }
+        .inspiration-hero-card p { font-size: 14px; color: #94a3b8; line-height: 1.6; }
+        
+        /* Modern Abstract Vector Geometric Graphic */
+        .hero-graphic-art {
+            width: 140px;
+            height: 140px;
+            background: linear-gradient(45deg, #a1e3f9, #c084fc);
+            border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%;
+            animation: waveMorph 8s ease-in-out infinite alternate;
+            box-shadow: 0 0 30px rgba(161, 227, 249, 0.3);
+            flex-shrink: 0;
+        }
+        @keyframes waveMorph {
+            0% { border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%; }
+            100% { border-radius: 50% 50% 30% 70% / 50% 60% 40% 60%; }
+        }
+
+        /* VISUAL SECTORS GRID */
+        .visual-sectors-row {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            margin-bottom: 35px;
+        }
+        @media (max-width: 800px) { .visual-sectors-row { grid-template-columns: repeat(2, 1fr); } }
+        
+        .sector-badge-card {
+            background: rgba(17, 26, 48, 0.6);
+            border: 1px solid #23355c;
+            padding: 20px 15px;
+            border-radius: 12px;
+            text-align: center;
+            transition: transform 0.2s;
+        }
+        .sector-badge-card:hover { transform: scale(1.03); border-color: #a1e3f9; }
+        .sector-badge-card .icon { font-size: 24px; margin-bottom: 8px; display: block; }
+        .sector-badge-card h4 { font-size: 13px; color: #fff; font-weight: 600; }
+
+        /* SEARCH FILTERS ROW */
+        .top-action-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            background: #0d162c;
+            padding: 15px 25px;
+            border-radius: 14px;
+            border: 1px solid #23355c;
+        }
+        .search-input { 
+            background: #0b1329; 
+            border: 1px solid #23355c; 
+            padding: 12px 20px; 
+            border-radius: 25px; 
+            color: #fff; 
+            font-size: 14px; 
+            width: 380px;
+        }
+        .search-input:focus { outline: none; border-color: #a1e3f9; }
+        .system-badge { color: #2ec4b6; font-size: 12px; font-weight: bold; text-transform: uppercase; }
+
+        /* DUAL LAYOUT COLS GROUP */
+        .dashboard-columns-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+        }
+        @media (max-width: 950px) { .dashboard-columns-grid { grid-template-columns: 1fr; } }
+
+        .column-panel {
+            background: #0b1224;
+            border: 1px solid #23355c;
+            border-radius: 16px;
+            padding: 25px;
+        }
+        .column-header { font-size: 15px; font-weight: bold; margin-bottom: 20px; display: flex; justify-content: space-between; border-bottom: 1px solid #23355c; padding-bottom: 12px; text-transform: uppercase; }
+        .column-header .counter-badge { font-size: 12px; background: rgba(255,255,255,0.05); padding: 2px 8px; border-radius: 10px; color: #a1e3f9; }
+
+        /* CARD AVATARS GRAPHICS LAYOUT */
+        .cards-flex-stack { display: flex; flex-direction: column; gap: 16px; }
+        
+        .pulse-card {
+            background: rgba(18, 30, 58, 0.45);
+            border: 1px solid #23355c;
+            border-radius: 14px;
+            padding: 20px;
+            display: flex;
+            gap: 16px;
+            align-items: flex-start;
+        }
+        
+        /* Interactive Profile Images */
+        .profile-avatar-frame {
+            width: 52px;
+            height: 52px;
+            border-radius: 50%;
+            background-color: #1e293b;
+            border: 2px solid #a1e3f9;
+            flex-shrink: 0;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .pulse-card.lecturer-type .profile-avatar-frame { border-color: #c084fc; }
+        
+        .profile-img-placeholder {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .card-body-content { flex-grow: 1; }
+        .pulse-card h4 { font-size: 16px; color: #fff; margin-bottom: 4px; }
+        
+        .domain-tag { font-size: 10px; color: #f5d061; font-weight: bold; text-transform: uppercase; margin-bottom: 8px; display: inline-block; border: 1px solid rgba(245, 208, 97, 0.3); padding: 2px 6px; border-radius: 4px; }
+        .pulse-card.lecturer-type .domain-tag { color: #c084fc; border-color: rgba(192, 132, 252, 0.3); }
+        
+        .pulse-card p { font-size: 13px; color: #94a3b8; line-height: 1.5; }
+
+        /* ================= CONFIGURATION PROFILE FORM SCREEN ================= */
+        .form-container-card {
+            background: #0b1224;
+            border: 1px solid #23355c;
+            border-radius: 16px;
+            padding: 35px;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        .form-container-card h3 { font-size: 20px; margin-bottom: 8px; color: #fff; }
+        .form-container-card p { font-size: 13px; color: #94a3b8; margin-bottom: 24px; }
+
+        /* ================= REGISTRATION MODAL FORM OVERLAY ================= */
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(3, 5, 17, 0.9); display: none; justify-content: center; align-items: center; z-index: 100; backdrop-filter: blur(5px); }
+        .modal-card { background: #0c152b; border: 1px solid #23355c; padding: 35px; border-radius: 16px; width: 420px; }
+        .modal-card h3 { margin-bottom: 18px; color: #fff; font-size: 18px; border-bottom: 1px solid #23355c; padding-bottom: 10px; }
+        
+        .form-group { display: flex; flex-direction: column; gap: 6px; margin-bottom: 16px; }
+        .form-group label { font-size: 11px; color: #94a3b8; font-weight: bold; text-transform: uppercase; }
+        .form-group input, .form-group select { background: #030611; border: 1px solid #23355c; padding: 12px; border-radius: 8px; color: #fff; font-size: 13px; }
+        .form-group input:focus { outline: none; border-color: #a1e3f9; }
+        
+        .modal-actions { display: flex; gap: 10px; margin-top: 25px; }
+        .btn-modal-save { background: #a1e3f9; color: #030611; border: none; padding: 12px; font-weight: bold; cursor: pointer; flex-grow: 1; border-radius: 6px; font-size: 13px; }
+        .btn-modal-close { background: transparent; color: #94a3b8; border: 1px solid #23355c; padding: 12px; cursor: pointer; border-radius: 6px; }
+    </style>
+</head>
+<body>
+
+    <div class="sidebar">
+        <div class="brand-section">
+            <div class="brand-logo">AuraPulse</div>
+            <div class="brand-tagline">Talent System Network</div>
+            <div class="brand-subtext">Designed for Creative Progress</div>
+        </div>
+        <ul class="nav-links-list">
+            <li class="nav-item active" id="btnNavHome" onclick="routeToScreen('home')">Home Dashboard</li>
+            <li class="nav-item" id="btnNavConfig" onclick="routeToScreen('config')">Profile Config</li>
+            <li class="nav-item" id="btnNavPrograms" onclick="routeToScreen('programs')">Selected Programs</li>
+            <li class="nav-item" style="margin-top: 25px; border: 1px dashed #a1e3f9; color: #a1e3f9; justify-content: center;" onclick="openRegistrationModal()">+ Quick Register</li>
+        </ul>
+    </div>
+
+    <div class="main-workspace">
+
+        <div id="viewScreenHome" class="app-view-screen active-view">
+            
+            <div class="inspiration-hero-card">
+                <div class="hero-text-block">
+                    <h2>Welcome to the <span>AuraPulse Workspace Hub</span></h2>
+                    <p>"Creativity is the blueprint of human progression. Whether you are mapping out advanced scientific models, choreographing performance physics, or synthesizing audio waves, excellence relies on shared visibility. This terminal serves as a live, frictionless network where students and evaluating lecturers connect directly without onboarding boundaries."</p>
+                </div>
+                <div class="hero-graphic-art"></div>
+            </div>
+
+            <div class="visual-sectors-row">
+                <div class="sector-badge-card"><span class="icon">📚</span><h4>Academic Research</h4></div>
+                <div class="sector-badge-card"><span class="icon">💃</span><h4>Performance Physics</h4></div>
+                <div class="sector-badge-card"><span class="icon">🎨</span><h4>UI/UX Design Graphics</h4></div>
+                <div class="sector-badge-card"><span class="icon">🔬</span><h4>Quantum Computation</h4></div>
+            </div>
+
+            <div class="top-action-bar">
+                <input type="text" class="search-input" id="txtDashboardGlobalSearch" placeholder="Search by names, domains, or keywords..." onkeyup="filterTalentMatrixRows()">
+                <div class="system-badge">Ecosystem Status: Active</div>
+            </div>
+
+            <div class="dashboard-columns-grid">
+                <div class="column-panel">
+                    <div class="column-header">
+                        <div>Registered Active Students</div>
+                        <div id="lblStudentCount" class="counter-badge">Count: 0</div>
+                    </div>
+                    <div class="cards-flex-stack" id="deckStudentsContainerPool"></div>
+                </div>
+
+                <div class="column-panel">
+                    <div class="column-header">
+                        <div>Available Faculty Lecturers</div>
+                        <div id="lblLecturerCount" class="counter-badge">Count: 0</div>
+                    </div>
+                    <div class="cards-flex-stack" id="deckLecturersContainerPool"></div>
+                </div>
+            </div>
+        </div>
+
+        <div id="viewScreenConfig" class="app-view-screen">
+            <div class="form-container-card">
+                <h3>👤 Profile Node Settings</h3>
+                <p>Modify and scale your infrastructure signature attributes below to synchronize token tracks.</p>
+                
+                <div class="form-group">
+                    <label>Ecosystem Access Handle Name</label>
+                    <input type="text" value="Administrator Core Workspace" placeholder="Enter target profile title name...">
+                </div>
+                <div class="form-group">
+                    <label>Active Domain Matrix Track</label>
+                    <select>
+                        <option>Quantum Computation Lab</option>
+                        <option>UI/UX Design & Frontend Graphics</option>
+                        <option>Performance Arts & Choreography Physics</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Terminal Contact Authentication Metadata</label>
+                    <input type="text" value="admin@aurapulse-matrix.net">
+                </div>
+                <button type="button" class="btn-modal-save" style="margin-top: 15px;" onclick="saveConfigConfirmation()">Update Network Token</button>
+            </div>
+        </div>
+
+        <div id="viewScreenPrograms" class="app-view-screen">
+            <div class="inspiration-hero-card" style="background: #111a30;">
+                <div class="hero-text-block" style="max-width: 100%;">
+                    <h2>📂 Selected Cluster Programs Tracking Sheet</h2>
+                    <p>Displaying live system telemetry queues reserved explicitly by your user track. Here you can trace isolated academic code updates and sync performance reviews.</p>
+                </div>
+            </div>
+            
+            <div class="column-panel">
+                <div class="column-header">Active Selected Matrix Pipeline</div>
+                <p style="color: #94a3b8; font-size: 14px; text-align: center; padding: 40px 0;">No tracks pinned. Click "Track Log Module" on the dashboard grid to populate this channel segment stream instantly.</p>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="modal-overlay" id="registrationModalBlock">
+        <div class="modal-card">
+            <h3>Quick Registry</h3>
+            <div class="form-group">
+                <label>Target Candidate Full Name</label>
+                <input type="text" id="regFormName" placeholder="e.g. Scholar ABC">
+            </div>
+            <div class="form-group">
+                <label>Account Assignment Track</label>
+                <select id="regFormRole">
+                    <option value="student">Student Registry File</option>
+                    <option value="lecturer">Faculty Profile</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Ecosystem Focus Domain</label>
+                <select id="regFormDomain">
+                    <option value="Academic Exploration">Academic Exploration</option>
+                    <option value="Dance Choreography">Dance Choreography</option>
+                    <option value="UI & Graphics Design">UI & Graphics Design</option>
+                    <option value="Symphonic Music Tracks">Symphonic Music Tracks</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Portfolio Log Details</label>
+                <input type="text" id="regFormDetails" placeholder="Type info narrative logs details here...">
+            </div>
+            <div class="modal-actions">
+                <button type="button" class="btn-modal-close" onclick="closeRegistrationModal()">Cancel</button>
+                <button type="button" class="btn-modal-save" onclick="commitRegistrationEntry()">Inject Entry Node</button>
+            </div>
+        </div>
+    </div>
+
+<script>
+    // System Data Array Core Modules Setup Records
+    var dynamicEcosystemDatabase = [
+        // STUDENT LIST IMAGES ARRAYS
+        { name: "Student ABC (Aarav Sharma)", role: "student", domain: "Academic Exploration", img: "https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?auto=format&fit=crop&w=100&q=80", details: "UID: AP-2026-9041. Logged multi-variable data array graphs mapping complex research streams." },
+        { name: "Student XYZ (Priya Nair)", role: "student", domain: "Quantum Lab", img: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=100&q=80", details: "UID: AP-2026-4412. Documenting structural quantum code matrices and telemetry logging networks." },
+        { name: "Student ABC (Rohan Malhotra)", role: "student", domain: "Symphonic Music Tracks", img: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=100&q=80", details: "UID: AP-2026-1182. Uploaded acoustic waveform audio records featuring midi mapping logs." },
+        { name: "Student XYZ (Emily Chen)", role: "student", domain: "Dance Choreography", img: "https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=100&q=80", details: "UID: AP-2026-3091. Developed responsive theatrical fusion timeline movement tracking maps." },
+        
+        // LECTURER LIST IMAGES ARRAYS
+        { name: "Dr. Aris Vance", role: "lecturer", domain: "Academic Exploration", img: "https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&w=100&q=80", details: "Senior Lead Research Evaluator. Managing distributed cloud laboratory modules and research thesis metrics." },
+        { name: "Professor Clara Thorne", role: "lecturer", domain: "Symphonic Music Tracks", img: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=100&q=80", details: "Department Director of Orchestral Studies. Tracking active composition performance track indices." },
+        { name: "Maestro Julian Kincaid", role: "lecturer", domain: "Dance Choreography", img: "https://images.unsplash.com/photo-1492562080023-ab3db95bfbce?auto=format&fit=crop&w=100&q=80", details: "Performance Coach. Analyzing visual coordination files, rhythmic step files, and evaluation sheets." },
+        { name: "Director Sarah Jenkins", role: "lecturer", domain: "UI & Graphics Design", img: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=100&q=80", details: "Interactive Product Advisor. Inspecting structural front-end framework system files and digital asset links." }
+    ];
+
+    window.onload = function() {
+        renderEcosystemMatrix();
+    };<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AuraPulse - Interactive Program Matrix</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', system-ui, sans-serif; }
+        
+        body { 
+            background-color: #030611; 
+            color: #ffffff; 
+            min-height: 100vh;
+            display: flex;
+            overflow: hidden;
+        }
+
+        /* ================= SIDEBAR NAVIGATION ================= */
+        .sidebar {
+            width: 280px;
+            background-color: #060b18;
+            border-right: 1px solid #1e2d50;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            padding: 30px 20px;
+            flex-shrink: 0;
+        }
+
+        .brand-section { margin-bottom: 35px; text-align: left; padding-left: 10px; }
+        .brand-logo { font-size: 26px; font-weight: 800; color: #a1e3f9; letter-spacing: 0.5px; }
+        .brand-tagline { font-size: 11px; color: #f5d061; text-transform: uppercase; margin-top: 6px; letter-spacing: 1px; font-weight: 600; }
+        .brand-subtext { font-size: 12px; color: #64748b; margin-top: 4px; font-style: italic; }
+        
+        .nav-links-list { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+        .nav-item { 
+            padding: 14px 16px; 
+            color: #94a3b8; 
+            border-radius: 10px; 
+            cursor: pointer; 
+            font-size: 14px; 
+            font-weight: 600;
+            background: rgba(255,255,255,0.01);
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .nav-item:hover { background: rgba(161, 227, 249, 0.08); color: #a1e3f9; }
+        .nav-item.active { background: rgba(161, 227, 249, 0.15); color: #a1e3f9; border-left: 4px solid #a1e3f9; }
+
+        /* ================= ROUTING VIEWS MANAGEMENT ================= */
+        .main-workspace {
+            flex-grow: 1;
+            padding: 35px;
+            overflow-y: auto;
+            height: 100vh;
+            background: radial-gradient(circle at 50% 0%, #0b1528 0%, #030611 70%);
+        }
+
+        .app-view-screen {
+            display: none; /* Controlled via active tab script routing */
+        }
+        .app-view-screen.active-view {
+            display: block;
+            animation: fadeIn 0.4s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ================= GORGEOUS GRAPHICAL HERO SCREEN ================= */
+        .inspiration-hero-card {
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            border: 1px solid #23355c;
+            border-radius: 20px;
+            padding: 35px;
+            margin-bottom: 35px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+        }
+        .hero-text-block { max-width: 65%; }
+        .inspiration-hero-card h2 { font-size: 26px; margin-bottom: 12px; color: #fff; font-weight: 800; }
+        .inspiration-hero-card h2 span { color: #a1e3f9; }
+        .inspiration-hero-card p { font-size: 14px; color: #94a3b8; line-height: 1.6; }
+        
+        /* Modern Abstract Vector Geometric Graphic */
+        .hero-graphic-art {
+            width: 140px;
+            height: 140px;
+            background: linear-gradient(45deg, #a1e3f9, #c084fc);
+            border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%;
+            animation: waveMorph 8s ease-in-out infinite alternate;
+            box-shadow: 0 0 30px rgba(161, 227, 249, 0.3);
+            flex-shrink: 0;
+        }
+        @keyframes waveMorph {
+            0% { border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%; }
+            100% { border-radius: 50% 50% 30% 70% / 50% 60% 40% 60%; }
+        }
+
+        /* VISUAL SECTORS GRID */
+        .visual-sectors-row {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            margin-bottom: 35px;
+        }
+        @media (max-width: 800px) { .visual-sectors-row { grid-template-columns: repeat(2, 1fr); } }
+        
+        .sector-badge-card {
+            background: rgba(17, 26, 48, 0.6);
+            border: 1px solid #23355c;
+            padding: 20px 15px;
+            border-radius: 12px;
+            text-align: center;
+            transition: transform 0.2s;
+        }
+        .sector-badge-card:hover { transform: scale(1.03); border-color: #a1e3f9; }
+        .sector-badge-card .icon { font-size: 24px; margin-bottom: 8px; display: block; }
+        .sector-badge-card h4 { font-size: 13px; color: #fff; font-weight: 600; }
+
+        /* SEARCH FILTERS ROW */
+        .top-action-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            background: #0d162c;
+            padding: 15px 25px;
+            border-radius: 14px;
+            border: 1px solid #23355c;
+        }
+        .search-input { 
+            background: #0b1329; 
+            border: 1px solid #23355c; 
+            padding: 12px 20px; 
+            border-radius: 25px; 
+            color: #fff; 
+            font-size: 14px; 
+            width: 380px;
+        }
+        .search-input:focus { outline: none; border-color: #a1e3f9; }
+        .system-badge { color: #2ec4b6; font-size: 12px; font-weight: bold; text-transform: uppercase; }
+
+        /* DUAL LAYOUT COLS GROUP */
+        .dashboard-columns-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+        }
+        @media (max-width: 950px) { .dashboard-columns-grid { grid-template-columns: 1fr; } }
+
+        .column-panel {
+            background: #0b1224;
+            border: 1px solid #23355c;
+            border-radius: 16px;
+            padding: 25px;
+        }
+        .column-header { font-size: 15px; font-weight: bold; margin-bottom: 20px; display: flex; justify-content: space-between; border-bottom: 1px solid #23355c; padding-bottom: 12px; text-transform: uppercase; }
+        .column-header .counter-badge { font-size: 12px; background: rgba(255,255,255,0.05); padding: 2px 8px; border-radius: 10px; color: #a1e3f9; }
+
+        /* CARD AVATARS GRAPHICS LAYOUT */
+        .cards-flex-stack { display: flex; flex-direction: column; gap: 16px; }
+        
+        .pulse-card {
+            background: rgba(18, 30, 58, 0.45);
+            border: 1px solid #23355c;
+            border-radius: 14px;
+            padding: 20px;
+            display: flex;
+            gap: 16px;
+            align-items: flex-start;
+        }
+        
+        /* Interactive Profile Images */
+        .profile-avatar-frame {
+            width: 52px;
+            height: 52px;
+            border-radius: 50%;
+            background-color: #1e293b;
+            border: 2px solid #a1e3f9;
+            flex-shrink: 0;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .pulse-card.lecturer-type .profile-avatar-frame { border-color: #c084fc; }
+        
+        .profile-img-placeholder {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .card-body-content { flex-grow: 1; }
+        .pulse-card h4 { font-size: 16px; color: #fff; margin-bottom: 4px; }
+        
+        .domain-tag { font-size: 10px; color: #f5d061; font-weight: bold; text-transform: uppercase; margin-bottom: 8px; display: inline-block; border: 1px solid rgba(245, 208, 97, 0.3); padding: 2px 6px; border-radius: 4px; }
+        .pulse-card.lecturer-type .domain-tag { color: #c084fc; border-color: rgba(192, 132, 252, 0.3); }
+        
+        .pulse-card p { font-size: 13px; color: #94a3b8; line-height: 1.5; }
+
+        /* ================= CONFIGURATION PROFILE FORM SCREEN ================= */
+        .form-container-card {
+            background: #0b1224;
+            border: 1px solid #23355c;
+            border-radius: 16px;
+            padding: 35px;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        .form-container-card h3 { font-size: 20px; margin-bottom: 8px; color: #fff; }
+        .form-container-card p { font-size: 13px; color: #94a3b8; margin-bottom: 24px; }
+
+        /* ================= REGISTRATION MODAL FORM OVERLAY ================= */
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(3, 5, 17, 0.9); display: none; justify-content: center; align-items: center; z-index: 100; backdrop-filter: blur(5px); }
+        .modal-card { background: #0c152b; border: 1px solid #23355c; padding: 35px; border-radius: 16px; width: 420px; }
+        .modal-card h3 { margin-bottom: 18px; color: #fff; font-size: 18px; border-bottom: 1px solid #23355c; padding-bottom: 10px; }
+        
+        .form-group { display: flex; flex-direction: column; gap: 6px; margin-bottom: 16px; }
+        .form-group label { font-size: 11px; color: #94a3b8; font-weight: bold; text-transform: uppercase; }
+        .form-group input, .form-group select { background: #030611; border: 1px solid #23355c; padding: 12px; border-radius: 8px; color: #fff; font-size: 13px; }
+        .form-group input:focus { outline: none; border-color: #a1e3f9; }
+        
+        .modal-actions { display: flex; gap: 10px; margin-top: 25px; }
+        .btn-modal-save { background: #a1e3f9; color: #030611; border: none; padding: 12px; font-weight: bold; cursor: pointer; flex-grow: 1; border-radius: 6px; font-size: 13px; }
+        .btn-modal-close { background: transparent; color: #94a3b8; border: 1px solid #23355c; padding: 12px; cursor: pointer; border-radius: 6px; }
+    </style>
+</head>
+<body>
+
+    <div class="sidebar">
+        <div class="brand-section">
+            <div class="brand-logo">AuraPulse</div>
+            <div class="brand-tagline">Talent System Network</div>
+            <div class="brand-subtext">Designed for Creative Progress</div>
+        </div>
+        <ul class="nav-links-list">
+            <li class="nav-item active" id="btnNavHome" onclick="routeToScreen('home')">Home Dashboard</li>
+            <li class="nav-item" id="btnNavConfig" onclick="routeToScreen('config')">Profile Config</li>
+            <li class="nav-item" id="btnNavPrograms" onclick="routeToScreen('programs')">Selected Programs</li>
+            <li class="nav-item" style="margin-top: 25px; border: 1px dashed #a1e3f9; color: #a1e3f9; justify-content: center;" onclick="openRegistrationModal()">+ Quick Register</li>
+        </ul>
+    </div>
+
+    <div class="main-workspace">
+
+        <div id="viewScreenHome" class="app-view-screen active-view">
+            
+            <div class="inspiration-hero-card">
+                <div class="hero-text-block">
+                    <h2>Welcome to the <span>AuraPulse Workspace Hub</span></h2>
+                    <p>"Creativity is the blueprint of human progression. Whether you are mapping out advanced scientific models, choreographing performance physics, or synthesizing audio waves, excellence relies on shared visibility. This terminal serves as a live, frictionless network where students and evaluating lecturers connect directly without onboarding boundaries."</p>
+                </div>
+                <div class="hero-graphic-art"></div>
+            </div>
+
+            <div class="visual-sectors-row">
+                <div class="sector-badge-card"><span class="icon">📚</span><h4>Academic Research</h4></div>
+                <div class="sector-badge-card"><span class="icon">💃</span><h4>Performance Physics</h4></div>
+                <div class="sector-badge-card"><span class="icon">🎨</span><h4>UI/UX Design Graphics</h4></div>
+                <div class="sector-badge-card"><span class="icon">🔬</span><h4>Quantum Computation</h4></div>
+            </div>
+
+            <div class="top-action-bar">
+                <input type="text" class="search-input" id="txtDashboardGlobalSearch" placeholder="Search by names, domains, or keywords..." onkeyup="filterTalentMatrixRows()">
+                <div class="system-badge">Ecosystem Status: Active</div>
+            </div>
+
+            <div class="dashboard-columns-grid">
+                <div class="column-panel">
+                    <div class="column-header">
+                        <div>Registered Active Students</div>
+                        <div id="lblStudentCount" class="counter-badge">Count: 0</div>
+                    </div>
+                    <div class="cards-flex-stack" id="deckStudentsContainerPool"></div>
+                </div>
+
+                <div class="column-panel">
+                    <div class="column-header">
+                        <div>Available Faculty Lecturers</div>
+                        <div id="lblLecturerCount" class="counter-badge">Count: 0</div>
+                    </div>
+                    <div class="cards-flex-stack" id="deckLecturersContainerPool"></div>
+                </div>
+            </div>
+        </div>
+
+        <div id="viewScreenConfig" class="app-view-screen">
+            <div class="form-container-card">
+                <h3>👤 Profile Node Settings</h3>
+                <p>Modify and scale your infrastructure signature attributes below to synchronize token tracks.</p>
+                
+                <div class="form-group">
+                    <label>Ecosystem Access Handle Name</label>
+                    <input type="text" value="Administrator Core Workspace" placeholder="Enter target profile title name...">
+                </div>
+                <div class="form-group">
+                    <label>Active Domain Matrix Track</label>
+                    <select>
+                        <option>Quantum Computation Lab</option>
+                        <option>UI/UX Design & Frontend Graphics</option>
+                        <option>Performance Arts & Choreography Physics</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Terminal Contact Authentication Metadata</label>
+                    <input type="text" value="admin@aurapulse-matrix.net">
+                </div>
+                <button type="button" class="btn-modal-save" style="margin-top: 15px;" onclick="saveConfigConfirmation()">Update Network Token</button>
+            </div>
+        </div>
+
+        <div id="viewScreenPrograms" class="app-view-screen">
+            <div class="inspiration-hero-card" style="background: #111a30;">
+                <div class="hero-text-block" style="max-width: 100%;">
+                    <h2>📂 Selected Cluster Programs Tracking Sheet</h2>
+                    <p>Displaying live system telemetry queues reserved explicitly by your user track. Here you can trace isolated academic code updates and sync performance reviews.</p>
+                </div>
+            </div>
+            
+            <div class="column-panel">
+                <div class="column-header">Active Selected Matrix Pipeline</div>
+                <p style="color: #94a3b8; font-size: 14px; text-align: center; padding: 40px 0;">No tracks pinned. Click "Track Log Module" on the dashboard grid to populate this channel segment stream instantly.</p>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="modal-overlay" id="registrationModalBlock">
+        <div class="modal-card">
+            <h3>Quick Registry</h3>
+            <div class="form-group">
+                <label>Target Candidate Full Name</label>
+                <input type="text" id="regFormName" placeholder="e.g. Scholar ABC">
+            </div>
+            <div class="form-group">
+                <label>Account Assignment Track</label>
+                <select id="regFormRole">
+                    <option value="student">Student Registry File</option>
+                    <option value="lecturer">Faculty Profile</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Ecosystem Focus Domain</label>
+                <select id="regFormDomain">
+                    <option value="Academic Exploration">Academic Exploration</option>
+                    <option value="Dance Choreography">Dance Choreography</option>
+                    <option value="UI & Graphics Design">UI & Graphics Design</option>
+                    <option value="Symphonic Music Tracks">Symphonic Music Tracks</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Portfolio Log Details</label>
+                <input type="text" id="regFormDetails" placeholder="Type info narrative logs details here...">
+            </div>
+            <div class="modal-actions">
+                <button type="button" class="btn-modal-close" onclick="closeRegistrationModal()">Cancel</button>
+                <button type="button" class="btn-modal-save" onclick="commitRegistrationEntry()">Inject Entry Node</button>
+            </div>
+        </div>
+    </div>
+
+<script>
+    // System Data Array Core Modules Setup Records
+    var dynamicEcosystemDatabase = [
+        // STUDENT LIST IMAGES ARRAYS
+        { name: "Student ABC (Aarav Sharma)", role: "student", domain: "Academic Exploration", img: "https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?auto=format&fit=crop&w=100&q=80", details: "UID: AP-2026-9041. Logged multi-variable data array graphs mapping complex research streams." },
+        { name: "Student XYZ (Priya Nair)", role: "student", domain: "Quantum Lab", img: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=100&q=80", details: "UID: AP-2026-4412. Documenting structural quantum code matrices and telemetry logging networks." },
+        { name: "Student ABC (Rohan Malhotra)", role: "student", domain: "Symphonic Music Tracks", img: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=100&q=80", details: "UID: AP-2026-1182. Uploaded acoustic waveform audio records featuring midi mapping logs." },
+        { name: "Student XYZ (Emily Chen)", role: "student", domain: "Dance Choreography", img: "https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=100&q=80", details: "UID: AP-2026-3091. Developed responsive theatrical fusion timeline movement tracking maps." },
+        
+        // LECTURER LIST IMAGES ARRAYS
+        { name: "Dr. Aris Vance", role: "lecturer", domain: "Academic Exploration", img: "https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&w=100&q=80", details: "Senior Lead Research Evaluator. Managing distributed cloud laboratory modules and research thesis metrics." },
+        { name: "Professor Clara Thorne", role: "lecturer", domain: "Symphonic Music Tracks", img: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=100&q=80", details: "Department Director of Orchestral Studies. Tracking active composition performance track indices." },
+        { name: "Maestro Julian Kincaid", role: "lecturer", domain: "Dance Choreography", img: "https://images.unsplash.com/photo-1492562080023-ab3db95bfbce?auto=format&fit=crop&w=100&q=80", details: "Performance Coach. Analyzing visual coordination files, rhythmic step files, and evaluation sheets." },
+        { name: "Director Sarah Jenkins", role: "lecturer", domain: "UI & Graphics Design", img: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=100&q=80", details: "Interactive Product Advisor. Inspecting structural front-end framework system files and digital asset links." }
+    ];
+
+    window.onload = function() {
+        renderEcosystemMatrix();
+    };
