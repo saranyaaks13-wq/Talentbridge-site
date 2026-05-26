@@ -1,99 +1,65 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AuraPulse Ultra - Nexus Portal</title>
+    <title>AuraPulse Fix</title>
     <style>
-        :root {
-            --neon-cyan: #00f0ff;
-            --cyber-purple: #bd00ff;
-            --gold-alert: #ffb800;
-            --secure-green: #00ff66;
-            --bg-void: #05050d;
-            --panel-glass: rgba(13, 17, 33, 0.75);
-            --border-glow: rgba(0, 240, 255, 0.15);
-        }
+        body { background: #05050d; color: white; font-family: sans-serif; display: flex; }
+        .sidebar { width: 250px; background: #0d1122; height: 100vh; padding: 20px; }
+        .main { padding: 40px; color: white; }
+        .box { background: #1a1f35; padding: 20px; border-radius: 10px; border: 1px solid #333; }
+        h1 { color: #00f0ff; }
+    </style>
+</head>
+<body>
 
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', system-ui, sans-serif; }
-        
-        body { 
-            background-color: var(--bg-void); 
-            background-image: 
-                radial-gradient(circle at 80% 20%, rgba(189, 0, 255, 0.15) 0%, transparent 50%),
-                radial-gradient(circle at 10% 80%, rgba(0, 240, 255, 0.12) 0%, transparent 50%);
-            color: #ffffff; 
-            min-height: 100vh;
-            display: flex;
-            overflow: hidden;
-        }
+    <div class="sidebar">
+        <h2>AuraPulse</h2>
+        <p onclick="location.reload()" style="cursor:pointer; color: #aaa;">Click to Reload</p>
+    </div>
 
-        /* ================= PREMIUM VERTICAL NAVIGATION BAR ================= */
-        .sidebar {
-            width: 290px;
-            background: linear-gradient(180deg, #070913 0%, #030408 100%);
-            border-right: 1px solid rgba(255, 255, 255, 0.08);
-            display: flex;
-            flex-direction: column;
-            height: 100vh;
-            padding: 35px 22px;
-            flex-shrink: 0;
-            justify-content: space-between;
-        }
+    <div class="main">
+        <div class="box">
+            <h1>System Operational</h1>
+            <p>If you can see this text, the browser is finally allowing the code to render.</p>
+            <p id="debug-msg"></p>
+        </div>
+    </div>
 
-        .brand-section { padding-left: 10px; }
-        .brand-logo { font-size: 28px; font-weight: 900; color: #fff; letter-spacing: 1px; }
-        .brand-logo span { color: var(--neon-cyan); text-shadow: 0 0 15px rgba(0, 240, 255, 0.6); }
-        .brand-tagline { font-size: 10px; color: var(--gold-alert); text-transform: uppercase; margin-top: 6px; letter-spacing: 2px; font-weight: 700; }
-        .brand-subtext { font-size: 12px; color: #4e5d78; margin-top: 5px; font-style: italic; }
-        
-        .nav-links-list { list-style: none; display: flex; flex-direction: column; gap: 12px; margin-top: 40px; flex-grow: 1; }
-        .nav-item { 
-            padding: 14px 18px; 
-            color: #7e8c9f; 
-            border-radius: 12px; 
-            cursor: pointer; 
-            font-size: 14px; 
-            font-weight: 700;
-            background: rgba(255, 255, 255, 0.02);
-            border: 1px solid transparent;
-            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-        .nav-item .nav-icon { font-size: 18px; filter: grayscale(40%); }
-        .nav-item:hover { background: rgba(0, 240, 255, 0.05); color: var(--neon-cyan); border-color: rgba(0, 240, 255, 0.2); }
-        .nav-item.active { background: linear-gradient(90deg, rgba(0,240,255,0.15) 0%, transparent 100%); color: #fff; border-left: 4px solid var(--neon-cyan); border-color: rgba(0, 240, 255, 0.3) rgba(0, 240, 255, 0.05) rgba(0, 240, 255, 0.05) rgba(0, 240, 255, 0.3); }
+    <script>
+        document.getElementById('debug-msg').innerText = "Status: Script engine active at " + new Date().toLocaleTimeString();
+    </script>
 
-        .sidebar-footer-shield {
-            background: rgba(0, 255, 102, 0.04);
-            border: 1px dashed rgba(0, 255, 102, 0.2);
-            padding: 12px;
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-size: 12px;
-            color: var(--secure-green);
-        }
+</body>
+</html><!DOCTYPE html>
+<html>
+<head>
+    <title>AuraPulse Fix</title>
+    <style>
+        body { background: #05050d; color: white; font-family: sans-serif; display: flex; }
+        .sidebar { width: 250px; background: #0d1122; height: 100vh; padding: 20px; }
+        .main { padding: 40px; color: white; }
+        .box { background: #1a1f35; padding: 20px; border-radius: 10px; border: 1px solid #333; }
+        h1 { color: #00f0ff; }
+    </style>
+</head>
+<body>
 
-        /* ================= CENTRAL VIEWSPACE LAYOUT ================= */
-        .main-workspace {
-            flex-grow: 1;
-            padding: 40px;
-            overflow-y: auto;
-            height: 100vh;
-        }
+    <div class="sidebar">
+        <h2>AuraPulse</h2>
+        <p onclick="location.reload()" style="cursor:pointer; color: #aaa;">Click to Reload</p>
+    </div>
 
-        .app-view-screen { display: none; }
-        .app-view-screen.active-view { display: block; animation: viewSlideIn 0.45s cubic-bezier(0.16, 1, 0.3, 1); }
+    <div class="main">
+        <div class="box">
+            <h1>System Operational</h1>
+            <p>If you can see this text, the browser is finally allowing the code to render.</p>
+            <p id="debug-msg"></p>
+        </div>
+    </div>
 
-        @keyframes viewSlideIn {
-            from { opacity: 0; transform: translateY(15px); filter: blur(4px); }
-            to { opacity: 1; transform: translateY(0); filter: blur(0); }
-        }
+    <script>
+        document.getElementById('debug-msg').innerText = "Status: Script engine active at " + new Date().toLocaleTimeString();
+    </script>
 
-        /* ================= DESIGN BANNER HEADER HERO ================= */
-        .inspiration-hero-card {
-            background: linear-gradient(135deg, rgba(15, 21, 44, 0.8)
+</body>
+</html>
