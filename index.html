@@ -3,356 +3,97 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AuraPulse - Interactive Program Matrix</title>
+    <title>AuraPulse Ultra - Nexus Portal</title>
     <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: sans-serif; }
+        :root {
+            --neon-cyan: #00f0ff;
+            --cyber-purple: #bd00ff;
+            --gold-alert: #ffb800;
+            --secure-green: #00ff66;
+            --bg-void: #05050d;
+            --panel-glass: rgba(13, 17, 33, 0.75);
+            --border-glow: rgba(0, 240, 255, 0.15);
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', system-ui, sans-serif; }
         
         body { 
-            background-color: #030611; 
+            background-color: var(--bg-void); 
+            background-image: 
+                radial-gradient(circle at 80% 20%, rgba(189, 0, 255, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 10% 80%, rgba(0, 240, 255, 0.12) 0%, transparent 50%);
             color: #ffffff; 
             min-height: 100vh;
             display: flex;
+            overflow: hidden;
         }
 
-        /* SIDEBAR NAVIGATION */
+        /* ================= PREMIUM VERTICAL NAVIGATION BAR ================= */
         .sidebar {
-            width: 260px;
-            background-color: #0a1020;
-            border-right: 1px solid #23355c;
+            width: 290px;
+            background: linear-gradient(180deg, #070913 0%, #030408 100%);
+            border-right: 1px solid rgba(255, 255, 255, 0.08);
             display: flex;
             flex-direction: column;
             height: 100vh;
-            padding: 25px 20px;
+            padding: 35px 22px;
+            flex-shrink: 0;
+            justify-content: space-between;
         }
 
-        .brand-section { margin-bottom: 35px; text-align: center; }
-        .brand-logo { font-size: 24px; font-weight: bold; color: #a1e3f9; letter-spacing: 1px; }
-        .brand-tagline { font-size: 10px; color: #f5d061; text-transform: uppercase; margin-top: 5px; }
+        .brand-section { padding-left: 10px; }
+        .brand-logo { font-size: 28px; font-weight: 900; color: #fff; letter-spacing: 1px; }
+        .brand-logo span { color: var(--neon-cyan); text-shadow: 0 0 15px rgba(0, 240, 255, 0.6); }
+        .brand-tagline { font-size: 10px; color: var(--gold-alert); text-transform: uppercase; margin-top: 6px; letter-spacing: 2px; font-weight: 700; }
+        .brand-subtext { font-size: 12px; color: #4e5d78; margin-top: 5px; font-style: italic; }
         
-        .nav-links-list { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+        .nav-links-list { list-style: none; display: flex; flex-direction: column; gap: 12px; margin-top: 40px; flex-grow: 1; }
         .nav-item { 
-            padding: 12px 16px; 
-            color: #94a3b8; 
-            border-radius: 8px; 
+            padding: 14px 18px; 
+            color: #7e8c9f; 
+            border-radius: 12px; 
             cursor: pointer; 
             font-size: 14px; 
-            font-weight: 600;
-            background: rgba(255,255,255,0.02);
+            font-weight: 700;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid transparent;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            align-items: center;
+            gap: 12px;
         }
-        .nav-item:hover { background: rgba(161, 227, 249, 0.1); color: #a1e3f9; }
-        .nav-item.active { background: rgba(161, 227, 249, 0.15); color: #a1e3f9; }
+        .nav-item .nav-icon { font-size: 18px; filter: grayscale(40%); }
+        .nav-item:hover { background: rgba(0, 240, 255, 0.05); color: var(--neon-cyan); border-color: rgba(0, 240, 255, 0.2); }
+        .nav-item.active { background: linear-gradient(90deg, rgba(0,240,255,0.15) 0%, transparent 100%); color: #fff; border-left: 4px solid var(--neon-cyan); border-color: rgba(0, 240, 255, 0.3) rgba(0, 240, 255, 0.05) rgba(0, 240, 255, 0.05) rgba(0, 240, 255, 0.3); }
 
-        /* MAIN CANVAS WORKSPACE */
+        .sidebar-footer-shield {
+            background: rgba(0, 255, 102, 0.04);
+            border: 1px dashed rgba(0, 255, 102, 0.2);
+            padding: 12px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 12px;
+            color: var(--secure-green);
+        }
+
+        /* ================= CENTRAL VIEWSPACE LAYOUT ================= */
         .main-workspace {
             flex-grow: 1;
-            padding: 35px;
+            padding: 40px;
             overflow-y: auto;
             height: 100vh;
         }
 
-        /* INSPIRATIONAL HERO CARD */
+        .app-view-screen { display: none; }
+        .app-view-screen.active-view { display: block; animation: viewSlideIn 0.45s cubic-bezier(0.16, 1, 0.3, 1); }
+
+        @keyframes viewSlideIn {
+            from { opacity: 0; transform: translateY(15px); filter: blur(4px); }
+            to { opacity: 1; transform: translateY(0); filter: blur(0); }
+        }
+
+        /* ================= DESIGN BANNER HEADER HERO ================= */
         .inspiration-hero-card {
-            background: #0f172a;
-            border: 1px solid #23355c;
-            border-radius: 16px;
-            padding: 30px;
-            margin-bottom: 30px;
-        }
-        .inspiration-hero-card h2 { font-size: 22px; margin-bottom: 12px; color: #fff; }
-        .inspiration-hero-card h2 span { color: #a1e3f9; }
-        .inspiration-hero-card p { font-size: 14px; color: #94a3b8; line-height: 1.6; }
-
-        /* CATEGORY BADGES GRID */
-        .visual-sectors-row {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 15px;
-            margin-bottom: 35px;
-        }
-        @media (max-width: 800px) { .visual-sectors-row { grid-template-columns: repeat(2, 1fr); } }
-        
-        .sector-badge-card {
-            background: #111a30;
-            border: 1px solid #23355c;
-            padding: 18px 15px;
-            border-radius: 12px;
-            text-align: center;
-        }
-        .sector-badge-card h4 { font-size: 13px; color: #fff; font-weight: 600; }
-
-        /* INTERACTIVE ACTION BAR */
-        .top-action-bar {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 30px;
-            background: #0d162c;
-            padding: 15px 25px;
-            border-radius: 12px;
-            border: 1px solid #23355c;
-        }
-        .search-input { 
-            background: #0b1329; 
-            border: 1px solid #23355c; 
-            padding: 12px 20px; 
-            border-radius: 25px; 
-            color: #fff; 
-            font-size: 14px; 
-            width: 350px;
-        }
-        .system-badge { color: #2ec4b6; font-size: 12px; font-weight: bold; text-transform: uppercase; letter-spacing: 0.5px; }
-
-        /* CORE DUAL COLUMNS GRID */
-        .dashboard-columns-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 30px;
-        }
-        @media (max-width: 950px) { .dashboard-columns-grid { grid-template-columns: 1fr; } }
-
-        .column-panel {
-            background: #0b1224;
-            border: 1px solid #23355c;
-            border-radius: 16px;
-            padding: 25px;
-        }
-        .column-header { font-size: 15px; font-weight: bold; margin-bottom: 20px; display: flex; justify-content: space-between; border-bottom: 1px solid #23355c; padding-bottom: 12px; text-transform: uppercase; letter-spacing: 0.5px; }
-        .column-header .counter-badge { font-size: 12px; background: rgba(255,255,255,0.05); padding: 2px 8px; border-radius: 10px; color: #a1e3f9; }
-
-        /* ASSIGNED PROFILE CARDS */
-        .cards-flex-stack { display: flex; flex-direction: column; gap: 16px; }
-        
-        .pulse-card {
-            background: rgba(18, 30, 58, 0.45);
-            border: 1px solid #23355c;
-            border-radius: 12px;
-            padding: 20px;
-        }
-        .pulse-card h4 { font-size: 16px; color: #fff; margin-bottom: 6px; }
-        
-        .domain-tag { font-size: 10px; color: #f5d061; font-weight: bold; text-transform: uppercase; margin-bottom: 10px; display: inline-block; border: 1px solid rgba(245, 208, 97, 0.3); padding: 2px 8px; border-radius: 4px; background: rgba(245, 208, 97, 0.02); }
-        .pulse-card.lecturer-type .domain-tag { color: #c084fc; border-color: rgba(192, 132, 252, 0.3); background: rgba(192, 132, 252, 0.02); }
-        
-        .pulse-card p { font-size: 13px; color: #94a3b8; line-height: 1.5; }
-        .action-footer-btn { background: rgba(161, 227, 249, 0.05); border: 1px solid #23355c; padding: 8px 14px; border-radius: 6px; font-size: 11px; font-weight: bold; color: #a1e3f9; cursor: pointer; margin-top: 14px; transition: all 0.2s; }
-        .action-footer-btn:hover { background: #a1e3f9; color: #030611; }
-
-        /* REGISTRATION OVERLAY SYSTEM */
-        .modal-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(3, 5, 17, 0.85); display: none; justify-content: center; align-items: center; z-index: 100; backdrop-filter: blur(5px); }
-        .modal-card { background: #0c152b; border: 1px solid #23355c; padding: 35px; border-radius: 16px; width: 420px; box-shadow: 0 10px 40px rgba(0,0,0,0.5); }
-        .modal-card h3 { margin-bottom: 18px; color: #fff; font-size: 18px; border-bottom: 1px solid #23355c; padding-bottom: 10px; }
-        .form-group { display: flex; flex-direction: column; gap: 6px; margin-bottom: 14px; }
-        .form-group label { font-size: 11px; color: #94a3b8; font-weight: bold; text-transform: uppercase; }
-        .form-group input, .form-group select { background: #030611; border: 1px solid #23355c; padding: 11px; border-radius: 6px; color: #fff; font-size: 13px; }
-        .form-group input:focus, .form-group select:focus { outline: none; border-color: #a1e3f9; }
-        .modal-actions { display: flex; gap: 10px; margin-top: 22px; }
-        .btn-modal-save { background: #a1e3f9; color: #030611; border: none; padding: 12px; font-weight: bold; cursor: pointer; flex-grow: 1; border-radius: 6px; font-size: 13px; }
-        .btn-modal-close { background: transparent; color: #94a3b8; border: 1px solid #23355c; padding: 12px; cursor: pointer; border-radius: 6px; font-size: 13px; }
-        .btn-modal-close:hover { color: #fff; background: rgba(255,255,255,0.02); }
-    </style>
-</head>
-<body>
-
-    <div class="sidebar">
-        <div class="brand-section">
-            <div class="brand-logo">AuraPulse</div>
-            <div class="brand-tagline">Integrated Talent Matrix</div>
-        </div>
-        <ul class="nav-links-list">
-            <li class="nav-item active" onclick="switchMenuContext('Home Base')">Home Dashboard</li>
-            <li class="nav-item" onclick="switchMenuContext('Profile Configuration')">Profile Config</li>
-            <li class="nav-item" onclick="switchMenuContext('Selected Programs')">Selected Programs</li>
-            <li class="nav-item" style="margin-top: 20px; border: 1px dashed #a1e3f9; color: #a1e3f9; text-align: center;" onclick="openRegistrationModal()">+ Quick Register</li>
-        </ul>
-    </div>
-
-    <div class="main-workspace">
-
-        <div class="inspiration-hero-card">
-            <h2>Welcome to the <span>AuraPulse Ecosystem</span></h2>
-            <p>"Creativity is the blueprint of human progression. Whether you are mapping out advanced scientific models, choreographing performance physics, or synthesizing audio waves, excellence relies on shared visibility. This terminal serves as a live, frictionless network where students and evaluating lecturers connect directly without onboarding boundaries."</p>
-        </div>
-
-        <div class="visual-sectors-row">
-            <div class="sector-badge-card"><h4>Academic Research</h4></div>
-            <div class="sector-badge-card"><h4>Performance Physics</h4></div>
-            <div class="sector-badge-card"><h4>UI/UX Design Graphics</h4></div>
-            <div class="sector-badge-card"><h4>Quantum Computation</h4></div>
-        </div>
-
-        <div class="top-action-bar">
-            <input type="text" class="search-input" id="txtDashboardGlobalSearch" placeholder="Search by names or focus track fields..." onkeyup="filterTalentMatrixRows()">
-            <div class="system-badge">Ecosystem Status: Active</div>
-        </div>
-
-        <div class="dashboard-columns-grid">
-            <div class="column-panel">
-                <div class="column-header">
-                    <div>Registered Students Tracking</div>
-                    <div id="lblStudentCount" class="counter-badge">Count: 0</div>
-                </div>
-                <div class="cards-flex-stack" id="deckStudentsContainerPool"></div>
-            </div>
-
-            <div class="column-panel">
-                <div class="column-header">
-                    <div>Faculty Lecturers Directory</div>
-                    <div id="lblLecturerCount" class="counter-badge">Count: 0</div>
-                </div>
-                <div class="cards-flex-stack" id="deckLecturersContainerPool"></div>
-            </div>
-        </div>
-
-    </div>
-
-    <div class="modal-overlay" id="registrationModalBlock">
-        <div class="modal-card">
-            <h3>Quick Registry</h3>
-            <div class="form-group">
-                <label>Target Candidate Full Name</label>
-                <input type="text" id="regFormName" placeholder="e.g. Student ABC">
-            </div>
-            <div class="form-group">
-                <label>Account Assignment Track</label>
-                <select id="regFormRole">
-                    <option value="student">Student Registry File</option>
-                    <option value="lecturer">Faculty Profile</option>
-                </select>
-            </div>
-            <div class="form-group">
-                <label>Ecosystem Focus Domain</label>
-                <select id="regFormDomain">
-                    <option value="Academic Exploration">Academic Exploration</option>
-                    <option value="Dance Choreography">Dance Choreography</option>
-                    <option value="UI & Graphics Design">UI & Graphics Design</option>
-                    <option value="Symphonic Music Tracks">Symphonic Music Tracks</option>
-                </select>
-            </div>
-            <div class="form-group">
-                <label>Portfolio Log Details</label>
-                <input type="text" id="regFormDetails" placeholder="Type background metrics details...">
-            </div>
-            <div class="modal-actions">
-                <button type="button" class="btn-modal-close" onclick="closeRegistrationModal()">Cancel</button>
-                <button type="button" class="btn-modal-save" onclick="commitRegistrationEntry()">Inject Entry Node</button>
-            </div>
-        </div>
-    </div>
-
-<script>
-    // Traditional Safe JS Arrays Setup Structure
-    var dynamicEcosystemDatabase = [
-        { name: "Student ABC (Aarav Sharma)", role: "student", domain: "Academic Exploration", details: "UID: AP-2026-9041. Logged multi-variable data array graphs mapping complex research streams." },
-        { name: "Student XYZ (Priya Nair)", role: "student", domain: "Quantum Lab", details: "UID: AP-2026-4412. Documenting structural quantum code matrices and telemetry logging networks." },
-        { name: "Student ABC (Rohan Malhotra)", role: "student", domain: "Symphonic Music Tracks", details: "UID: AP-2026-1182. Uploaded acoustic waveform audio records featuring midi mapping logs." },
-        { name: "Student XYZ (Emily Chen)", role: "student", domain: "Dance Choreography", details: "UID: AP-2026-3091. Developed responsive theatrical fusion timeline movement tracking maps." },
-        { name: "Dr. Aris Vance", role: "lecturer", domain: "Academic Exploration", details: "Senior Lead Research Evaluator. Managing distributed cloud laboratory modules and research thesis metrics." },
-        { name: "Professor Clara Thorne", role: "lecturer", domain: "Symphonic Music Tracks", details: "Department Director of Orchestral Studies. Tracking active composition performance track indices." },
-        { name: "Maestro Julian Kincaid", role: "lecturer", domain: "Dance Choreography", details: "Performance Coach. Analyzing visual coordination files, rhythmic step files, and evaluation sheets." },
-        { name: "Director Sarah Jenkins", role: "lecturer", domain: "UI & Graphics Design", details: "Interactive Product Advisor. Inspecting structural front-end framework system files and digital asset links." }
-    ];
-
-    // Safest execution strategy across all modern and old browsers alike
-    window.onload = function() {
-        renderEcosystemMatrix();
-    };
-
-    function renderEcosystemMatrix() {
-        var studentPool = document.getElementById('deckStudentsContainerPool');
-        var lecturerPool = document.getElementById('deckLecturersContainerPool');
-
-        if (!studentPool || !lecturerPool) { return; }
-
-        studentPool.innerHTML = "";
-        lecturerPool.innerHTML = "";
-
-        var sCount = 0;
-        var lCount = 0;
-
-        for (var i = 0; i < dynamicEcosystemDatabase.length; i++) {
-            var record = dynamicEcosystemDatabase[i];
-            var cardElement = document.createElement('div');
-            
-            if (record.role === 'lecturer') {
-                cardElement.className = "pulse-card lecturer-type";
-            } else {
-                cardElement.className = "pulse-card";
-            }
-            
-            cardElement.setAttribute('data-keywords', record.name.toLowerCase() + " " + record.domain.toLowerCase() + " " + record.details.toLowerCase());
-            
-            // Safe execution concatenation logic string rows layout
-            var contentString = "<h4>" + record.name + "</h4>";
-            contentString += "<span class='domain-tag'>" + record.domain + "</span>";
-            contentString += "<p>" + record.details + "</p>";
-            contentString += "<button type='button' class='action-footer-btn' onclick=\"triggerTrackEngagement('" + record.name + "')\">Track Log Module</button>";
-            
-            cardElement.innerHTML = contentString;
-
-            if (record.role === 'student') {
-                studentPool.appendChild(cardElement);
-                sCount++;
-            } else {
-                lecturerPool.appendChild(cardElement);
-                lCount++;
-            }
-        }
-
-        document.getElementById('lblStudentCount').innerText = "Count: " + sCount;
-        document.getElementById('lblLecturerCount').innerText = "Count: " + lCount;
-    }
-
-    function filterTalentMatrixRows() {
-        var searchPhrase = document.getElementById('txtDashboardGlobalSearch').value.toLowerCase().trim();
-        var cards = document.querySelectorAll('.pulse-card');
-
-        for (var i = 0; i < cards.length; i++) {
-            var card = cards[i];
-            var dataTerms = card.getAttribute('data-keywords');
-            if (dataTerms.indexOf(searchPhrase) > -1) {
-                card.style.display = 'block';
-            } else {
-                card.style.display = 'none';
-            }
-        }
-    }
-
-    function triggerTrackEngagement(targetIdentityName) {
-        alert("Connecting live monitoring stream to: " + targetIdentityName);
-    }
-
-    // Modal view handlers
-    function openRegistrationModal() {
-        document.getElementById('registrationModalBlock').style.display = 'flex';
-    }
-    
-    function closeRegistrationModal() {
-        document.getElementById('registrationModalBlock').style.display = 'none';
-    }
-
-    function commitRegistrationEntry() {
-        var name = document.getElementById('regFormName').value.trim();
-        var role = document.getElementById('regFormRole').value;
-        var domain = document.getElementById('regFormDomain').value;
-        var details = document.getElementById('regFormDetails').value.trim();
-
-        if(!name || !details) {
-            alert("Please complete fields before injecting entry data.");
-            return;
-        }
-
-        dynamicEcosystemDatabase.unshift({ name: name, role: role, domain: domain, details: details });
-        renderEcosystemMatrix();
-        closeRegistrationModal();
-
-        document.getElementById('regFormName').value = "";
-        document.getElementById('regFormDetails').value = "";
-    }
-
-    function switchMenuContext(menuName) {
-        alert("Switching active viewport content layout track context to: " + menuName);
-    }
-</script>
-
-</body>
-</html>
+            background: linear-gradient(135deg, rgba(15, 21, 44, 0.8)
